@@ -64,7 +64,7 @@ const SongRow = ({ song, index, playingTrack, onPlay }) => (
             <span className="opacity-80">{parseInt(song.play_count || 0).toLocaleString()}</span>
         </div>
 
-        <div className="text-xs text-slate-400 font-bold w-12 text-right">
+        <div className="hidden md:block text-xs text-slate-400 font-bold w-12 text-right">
             {song.more_info?.duration ? (
                 `${Math.floor(song.more_info.duration / 60)}:${(song.more_info.duration % 60).toString().padStart(2, '0')}`
             ) : '-'}
