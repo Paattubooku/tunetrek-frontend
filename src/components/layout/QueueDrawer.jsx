@@ -38,6 +38,40 @@ export default function QueueDrawer() {
         }
     };
 
+    // -- TOUCH SUPPORT --
+    const handleTouchStart = (e, index) => {
+        dragItem.current = index;
+        const item = e.target.closest('[data-queue-index]');
+        if (item) item.classList.add('opacity-50', 'bg-slate-100', 'dark:bg-white/10');
+    };
+
+    const handleTouchMove = (e) => {
+        if (dragItem.current !== null) {
+            e.preventDefault(); // Prevent scrolling while dragging handle
+        }
+    };
+
+    const handleTouchEnd = (e) => {
+        const touch = e.changedTouches[0];
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        const row = target?.closest('[data-queue-index]');
+
+        // Remove visuals from all items
+        document.querySelectorAll('[data-queue-index]').forEach(el =>
+            el.classList.remove('opacity-50', 'bg-slate-100', 'dark:bg-white/10')
+        );
+
+        if (row) {
+            const toIndex = parseInt(row.getAttribute('data-queue-index'));
+            const fromIndex = dragItem.current;
+
+            if (fromIndex !== null && !isNaN(toIndex) && fromIndex !== toIndex) {
+                dispatch(reorderQueue({ fromIndex, toIndex }));
+            }
+        }
+        dragItem.current = null;
+    };
+
     // Find current index
     const currentIndex = queue.findIndex(t => t.id?.toString() === currentTrack?.id?.toString());
 
@@ -174,6 +208,7 @@ export default function QueueDrawer() {
                                         return (
                                             <div
                                                 key={`${track.id}-${realIndex}`}
+                                                data-queue-index={realIndex}
                                                 className="relative flex items-center gap-3 p-2 rounded-xl hover:bg-white/60 dark:hover:bg-white/5 transition-all group cursor-pointer border border-transparent hover:border-slate-100 dark:hover:border-white/5 active:cursor-grabbing select-none"
                                                 onClick={() => dispatch(setCurrentTrack(track))}
                                                 draggable
@@ -184,7 +219,12 @@ export default function QueueDrawer() {
                                                 onDrop={handleDrop}
                                             >
                                                 {/* Drag Handle (Mobile/Desktop Visual) */}
-                                                <div className="text-slate-300 cursor-grab active:cursor-grabbing">
+                                                <div
+                                                    className="text-slate-300 cursor-grab active:cursor-grabbing p-2 -ml-2 touch-none"
+                                                    onTouchStart={(e) => handleTouchStart(e, realIndex)}
+                                                    onTouchMove={handleTouchMove}
+                                                    onTouchEnd={handleTouchEnd}
+                                                >
                                                     <span className="material-icons-round text-lg">drag_indicator</span>
                                                 </div>
                                                 <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 shadow-sm group-hover:shadow-md transition-all">
