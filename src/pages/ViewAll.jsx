@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { getHighQualityImage, extractIdFromUrl } from '../utils/imageUtils';
-import { useAppDispatch, useSelector } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { setCurrentTrack, setQueue } from '../store/slices/playerSlice';
 import { decodeHtmlEntities } from '../utils/stringUtils';
 import TrackMenu from '../components/common/TrackMenu';
@@ -11,7 +11,7 @@ export default function ViewAll() {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { title, items } = location.state || {};
-    const { currentTrack } = useSelector(state => state.player);
+    const { currentTrack } = useAppSelector(state => state.player);
 
     useEffect(() => {
         if (!items) {
@@ -70,8 +70,8 @@ export default function ViewAll() {
                             <div
                                 key={song.id}
                                 className={`group flex items-center gap-4 p-2 rounded-xl border border-transparent transition-all cursor-pointer ${isPlaying
-                                        ? 'bg-primary/10 border-primary/20 dark:bg-primary/20'
-                                        : 'hover:bg-white/60 dark:hover:bg-white/5 hover:border-slate-200 dark:hover:border-white/5'
+                                    ? 'bg-primary/10 border-primary/20 dark:bg-primary/20'
+                                    : 'hover:bg-white/60 dark:hover:bg-white/5 hover:border-slate-200 dark:hover:border-white/5'
                                     }`}
                                 onClick={() => handlePlaySong(song, index)}
                             >
