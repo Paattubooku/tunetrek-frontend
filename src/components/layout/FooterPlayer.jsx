@@ -232,7 +232,7 @@ export default function FooterPlayer() {
 
             isFetchingRadio.current = true;
 
-            fetch(`${API_URL}/moreRadioNew/${stationId}/20`)
+            fetch(`https://mserver-pi.vercel.app/moreRadioNew/${stationId}/20`)
                 .then(res => res.json())
                 .then(newSongs => {
                     if (Array.isArray(newSongs) && newSongs.length > 0) {
