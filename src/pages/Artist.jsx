@@ -31,7 +31,7 @@ const SongRow = ({ song, index, playingTrack, onPlay }) => (
             }`}
         onClick={() => onPlay(song, index)}
     >
-        <div className="w-8 h-8 flex items-center justify-center shrink-0 text-slate-400 font-bold text-sm">
+        <div className="hidden md:flex w-8 h-8 items-center justify-center shrink-0 text-slate-400 font-bold text-sm">
             {playingTrack === song.id ? (
                 <span className="material-icons-round text-primary animate-pulse">graphic_eq</span>
             ) : (
