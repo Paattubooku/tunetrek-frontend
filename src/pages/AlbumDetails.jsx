@@ -389,7 +389,7 @@ export default function AlbumDetails() {
                                 </div>
 
                                 {/* Duration */}
-                                <div className="text-sm text-slate-400 font-medium w-16 text-right z-10">
+                                <div className="hidden md:block text-sm text-slate-400 font-medium w-16 text-right z-10">
                                     {formatDuration(parseInt(song.more_info?.duration || 0))}
                                 </div>
 
