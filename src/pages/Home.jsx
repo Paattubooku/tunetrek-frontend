@@ -112,7 +112,7 @@ export default function Home() {
                         </Link>
                     </div>
 
-                    <div className="flex gap-6 overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory -mx-2 px-6">
+                    <div className="flex gap-6 overflow-x-auto hide-scrollbar snap-x snap-mandatory -mx-2 px-6">
                         {items.map((item, i) => (
                             <Link
                                 to={getItemLink(item)}
@@ -440,7 +440,7 @@ export default function Home() {
             )}
 
             {/* Render Other Sections */}
-            <div className="flex flex-col gap-12 pb-12">
+            <div className="flex flex-col pb-12">
                 {recentTracks.length > 0 && renderSection('Recently Played', recentTracks, -1)}
                 {Object.entries(homeData).map(([title, section], index) => {
                     if (title === "Trending Now") return null;
