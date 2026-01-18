@@ -57,14 +57,18 @@ export default function QueueDrawer() {
             ghost.style.width = `${rect.width}px`;
             ghost.style.height = `${rect.height}px`;
             ghost.style.zIndex = '9999';
-            ghost.style.opacity = '0.9';
+            ghost.style.opacity = '0.95';
             ghost.style.pointerEvents = 'none'; // Crucial so elementFromPoint works underneath
-            ghost.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
-            ghost.style.transform = 'scale(1.05)';
+            ghost.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.5)'; // Very strong lift shadow
+            ghost.style.transform = 'scale(1.02) rotate(2deg)'; // Slight tilt for organic feel
             ghost.style.transition = 'none'; // No lag
-            // Ensure background is solid (checking dark mode roughly or defaulting)
-            ghost.style.backgroundColor = document.documentElement.classList.contains('dark') ? '#1e1e1e' : '#ffffff';
-            ghost.classList.add('rounded-xl', 'border', 'border-primary'); // Add border for visibility
+
+            // Use specific colors that stand out slightly from the list
+            const isDark = document.documentElement.classList.contains('dark');
+            ghost.style.backgroundColor = isDark ? '#262626' : '#ffffff';
+
+            // Add a subtle ring instead of a border
+            ghost.classList.add('rounded-xl', 'ring-2', 'ring-primary', 'shadow-2xl');
 
             document.body.appendChild(ghost);
             dragGhost.current = ghost;
