@@ -10,6 +10,7 @@ export default function QueueDrawer() {
     const scrollRef = useRef(null);
     const dragItem = useRef(null);
     const dragOverItem = useRef(null);
+    const dragGhost = useRef(null);
 
     const handleDragStart = (e, position) => {
         dragItem.current = position;
@@ -42,16 +43,58 @@ export default function QueueDrawer() {
     const handleTouchStart = (e, index) => {
         dragItem.current = index;
         const item = e.target.closest('[data-queue-index]');
-        if (item) item.classList.add('opacity-50', 'bg-slate-100', 'dark:bg-white/10');
+
+        if (item) {
+            item.classList.add('opacity-50', 'bg-slate-100', 'dark:bg-white/10');
+
+            // Create Visual Ghost
+            const ghost = item.cloneNode(true);
+            const rect = item.getBoundingClientRect();
+
+            ghost.style.position = 'fixed';
+            ghost.style.top = `${rect.top}px`;
+            ghost.style.left = `${rect.left}px`;
+            ghost.style.width = `${rect.width}px`;
+            ghost.style.height = `${rect.height}px`;
+            ghost.style.zIndex = '9999';
+            ghost.style.opacity = '0.9';
+            ghost.style.pointerEvents = 'none'; // Crucial so elementFromPoint works underneath
+            ghost.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+            ghost.style.transform = 'scale(1.05)';
+            ghost.style.transition = 'none'; // No lag
+            // Ensure background is solid (checking dark mode roughly or defaulting)
+            ghost.style.backgroundColor = document.documentElement.classList.contains('dark') ? '#1e1e1e' : '#ffffff';
+            ghost.classList.add('rounded-xl', 'border', 'border-primary'); // Add border for visibility
+
+            document.body.appendChild(ghost);
+            dragGhost.current = ghost;
+
+            // Offset logic for smooth dragging (holding point vs top-left)
+            const touch = e.touches[0];
+            dragGhost.current.dataset.offsetX = touch.clientX - rect.left;
+            dragGhost.current.dataset.offsetY = touch.clientY - rect.top;
+        }
     };
 
     const handleTouchMove = (e) => {
-        if (dragItem.current !== null) {
+        if (dragItem.current !== null && dragGhost.current) {
             e.preventDefault(); // Prevent scrolling while dragging handle
+            const touch = e.touches[0];
+            const offsetX = parseFloat(dragGhost.current.dataset.offsetX || 0);
+            const offsetY = parseFloat(dragGhost.current.dataset.offsetY || 0);
+
+            dragGhost.current.style.left = `${touch.clientX - offsetX}px`;
+            dragGhost.current.style.top = `${touch.clientY - offsetY}px`;
         }
     };
 
     const handleTouchEnd = (e) => {
+        // Cleanup Ghost
+        if (dragGhost.current) {
+            document.body.removeChild(dragGhost.current);
+            dragGhost.current = null;
+        }
+
         const touch = e.changedTouches[0];
         const target = document.elementFromPoint(touch.clientX, touch.clientY);
         const row = target?.closest('[data-queue-index]');
