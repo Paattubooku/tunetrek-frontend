@@ -13,10 +13,7 @@
 export const getHighQualityImage = (imageUrl, size = '500x500') => {
     if (!imageUrl) return 'https://via.placeholder.com/500';
 
-    return imageUrl
-        .replace(/150x150/g, size)
-        .replace(/50x50/g, size)
-        .replace(/250x250/g, size);
+    return imageUrl.replace(/(\d+)x(\d+)/g, size);
 };
 
 /**
