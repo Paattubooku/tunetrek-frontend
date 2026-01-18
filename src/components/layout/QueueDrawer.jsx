@@ -174,7 +174,7 @@ export default function QueueDrawer() {
                                         return (
                                             <div
                                                 key={`${track.id}-${realIndex}`}
-                                                className="relative flex items-center gap-3 p-2 rounded-xl hover:bg-white/60 dark:hover:bg-white/5 transition-all group cursor-pointer border border-transparent hover:border-slate-100 dark:hover:border-white/5 active:cursor-grabbing"
+                                                className="relative flex items-center gap-3 p-2 rounded-xl hover:bg-white/60 dark:hover:bg-white/5 transition-all group cursor-pointer border border-transparent hover:border-slate-100 dark:hover:border-white/5 active:cursor-grabbing select-none"
                                                 onClick={() => dispatch(setCurrentTrack(track))}
                                                 draggable
                                                 onDragStart={(e) => handleDragStart(e, realIndex)}
