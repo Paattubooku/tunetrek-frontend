@@ -123,8 +123,9 @@ export default function TrackMenu({ song, className = "" }) {
                 return;
             }
 
-            const response = await fetch(`${API_URL}/radioNew?query=${id}`);
+            const response = await fetch(`https://mserver-pi.vercel.app/radioNew?query=${id}`);
 
+            console.log("radio response", response);
             if (!response.ok) {
                 throw new Error(`Radio API returned ${response.status}`);
             }
