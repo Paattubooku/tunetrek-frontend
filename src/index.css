@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #38bdf8;
+  /* Sky 400 - Bright Pop against Navy */
+  --color-background-light: #f0f9ff;
+  --color-background-dark: #132440;
+  /* User Requested Navy */
+  --color-glass-dark: rgba(10, 25, 47, 0.7);
+  /* Deep Navy Glass */
+  --color-glass-light: rgba(255, 255, 255, 0.9);
+  --font-display: "Inter", sans-serif;
+  --radius-xl: 1.75rem;
+  --radius-2xl: 2.5rem;
+  --radius-DEFAULT: 1.25rem;
+}
+
+@layer base {
+  body {
+    font-family: "Inter", sans-serif;
+    /* Deep Navy Gradient based on #132440 */
+    background: radial-gradient(circle at 50% 0%, #1e3a66 0%, #132440 60%, #0b1526 100%);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: #f1f5f9;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    background: var(--color-glass-dark);
+    backdrop-filter: blur(25px) saturate(160%);
+    -webkit-backdrop-filter: blur(25px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-panel-light {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(25px) saturate(160%);
+    -webkit-backdrop-filter: blur(25px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Blob Animation for Gradient Orbs */
+  @keyframes blob {
+
+    0%,
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  /* Float Animation for Geometric Shapes */
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+      transform: translateY(-20px) rotate(5deg);
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animation-delay-1000 {
+    animation-delay: 1s;
+  }
+
+  .animation-delay-3000 {
+    animation-delay: 3s;
+  }
+
+  /* Perspective for 3D effects */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+}
