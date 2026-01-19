@@ -30,12 +30,65 @@ export default function FooterPlayer() {
         return () => window.removeEventListener('keydown', handleEsc);
     }, []);
 
-    // Media Session API for lock screen controls and background playback
+    // --- Media Session API Configuration ---
+
+    // 1. Set Action Handlers (Run once to ensure buttons persist)
+    useEffect(() => {
+        if (!('mediaSession' in navigator)) return;
+
+        try {
+            // Play/Pause
+            navigator.mediaSession.setActionHandler('play', () => dispatch(setPlaying(true)));
+            navigator.mediaSession.setActionHandler('pause', () => dispatch(setPlaying(false)));
+            navigator.mediaSession.setActionHandler('stop', () => dispatch(setPlaying(false))); // Adding stop can act as a fallback
+
+            // Next/Prev
+            navigator.mediaSession.setActionHandler('previoustrack', () => dispatch(nextTrack()));
+            navigator.mediaSession.setActionHandler('previoustrack', () => dispatch(previousTrack()));
+
+            // Correction: Ensure explicit handlers for both directions
+            navigator.mediaSession.setActionHandler('previoustrack', () => {
+                dispatch(previousTrack());
+            });
+            navigator.mediaSession.setActionHandler('nexttrack', () => {
+                dispatch(nextTrack());
+            });
+
+            // Seek (Scrubbing)
+            navigator.mediaSession.setActionHandler('seekto', (details) => {
+                if (details.seekTime && audioRef.current) {
+                    audioRef.current.currentTime = details.seekTime;
+                }
+            });
+
+            // Explicitly unset the seek handlers we don't want
+            navigator.mediaSession.setActionHandler('seekbackward', null);
+            navigator.mediaSession.setActionHandler('seekforward', null);
+
+        } catch (error) {
+            console.warn('Media Session Action registration failed:', error);
+        }
+
+        return () => {
+            // Cleanup on unmount only
+            if ('mediaSession' in navigator) {
+                try {
+                    navigator.mediaSession.setActionHandler('play', null);
+                    navigator.mediaSession.setActionHandler('pause', null);
+                    navigator.mediaSession.setActionHandler('stop', null);
+                    navigator.mediaSession.setActionHandler('previoustrack', null);
+                    navigator.mediaSession.setActionHandler('nexttrack', null);
+                    navigator.mediaSession.setActionHandler('seekto', null);
+                } catch (e) { /* ignore */ }
+            }
+        };
+    }, [dispatch]);
+
+    // 2. Update Metadata (Run only when track changes)
     useEffect(() => {
         if (!currentTrack || !('mediaSession' in navigator)) return;
 
         try {
-            // Set metadata for lock screen display
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: decodeHtmlEntities(currentTrack.title),
                 artist: decodeHtmlEntities(currentTrack.subtitle || currentTrack.artist || 'Unknown Artist'),
@@ -49,52 +102,18 @@ export default function FooterPlayer() {
                     { src: getHighQualityImage(currentTrack.image), sizes: '512x512', type: 'image/jpeg' },
                 ]
             });
-
-            // Set action handlers for lock screen controls
-            navigator.mediaSession.setActionHandler('play', () => {
-                dispatch(setPlaying(true));
-            });
-
-            navigator.mediaSession.setActionHandler('pause', () => {
-                dispatch(setPlaying(false));
-            });
-
-            navigator.mediaSession.setActionHandler('previoustrack', () => {
-                dispatch(previousTrack());
-            });
-
-            navigator.mediaSession.setActionHandler('nexttrack', () => {
-                dispatch(nextTrack());
-            });
-
-            navigator.mediaSession.setActionHandler('seekto', (details) => {
-                if (details.seekTime && audioRef.current) {
-                    audioRef.current.currentTime = details.seekTime;
-                }
-            });
-
-            // Update playback state
-            navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
-
         } catch (error) {
-            console.warn('Media Session API error:', error);
+            console.warn('Media Session Metadata error:', error);
         }
+    }, [currentTrack]);
 
-        return () => {
-            // Clean up handlers
-            if ('mediaSession' in navigator) {
-                try {
-                    navigator.mediaSession.setActionHandler('play', null);
-                    navigator.mediaSession.setActionHandler('pause', null);
-                    navigator.mediaSession.setActionHandler('previoustrack', null);
-                    navigator.mediaSession.setActionHandler('nexttrack', null);
-                    navigator.mediaSession.setActionHandler('seekto', null);
-                } catch (e) {
-                    // Ignore cleanup errors
-                }
-            }
-        };
-    }, [currentTrack, isPlaying, dispatch]);
+    // 3. Update Playback State (Run when playing state changes)
+    useEffect(() => {
+        if (!('mediaSession' in navigator)) return;
+        try {
+            navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
+        } catch (e) { /* ignore */ }
+    }, [isPlaying]);
 
     // Update Media Session position state
     useEffect(() => {
