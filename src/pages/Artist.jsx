@@ -1,120 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getHighQualityImage, extractIdFromUrl } from '../utils/imageUtils';
-import { useAppDispatch } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { setCurrentTrack, setQueue } from '../store/slices/playerSlice';
+import { getHighQualityImage, extractIdFromUrl } from '../utils/imageUtils';
 import { decodeHtmlEntities } from '../utils/stringUtils';
-import TrackMenu from '../components/common/TrackMenu';
-import AlbumMenu from '../components/common/AlbumMenu';
 import API_URL from '../config/api.js';
-
-// --- Sub-Components for Tabs ---
-
-const TabButton = ({ active, label, onClick, icon }) => (
-    <button
-        onClick={onClick}
-        className={`relative px-6 py-3 rounded-full font-bold text-sm md:text-base transition-all duration-300 flex items-center gap-2 ${active
-            ? 'bg-slate-900 text-white dark:bg-white dark:text-black shadow-lg shadow-black/10 scale-105'
-            : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
-            }`}
-    >
-        {icon && <span className="material-icons-round text-lg">{icon}</span>}
-        {label}
-    </button>
-);
-
-const SongRow = ({ song, index, playingTrack, onPlay }) => (
-    <div
-        className={`group relative flex items-center gap-4 p-3 rounded-xl transition-all cursor-pointer border ${playingTrack === song.id
-            ? 'bg-primary/10 border-primary/20 dark:bg-primary/20'
-            : 'hover:bg-slate-100/50 dark:hover:bg-white/5 border-transparent'
-            }`}
-        onClick={() => onPlay(song, index)}
-    >
-        <div className="hidden md:flex w-8 h-8 items-center justify-center shrink-0 text-slate-400 font-bold text-sm">
-            {playingTrack === song.id ? (
-                <span className="material-icons-round text-primary animate-pulse">graphic_eq</span>
-            ) : (
-                <>
-                    <span className="group-hover:hidden">{index + 1}</span>
-                    <span className="material-icons-round hidden group-hover:block text-slate-800 dark:text-white">play_arrow</span>
-                </>
-            )}
-        </div>
-
-        <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0 shadow-sm">
-            <img
-                src={getHighQualityImage(song.image)}
-                alt={song.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-            />
-        </div>
-
-        <div className="flex-1 min-w-0">
-            <h4 className={`font-bold truncate text-sm md:text-base ${playingTrack === song.id ? 'text-primary' : 'text-slate-800 dark:text-slate-100'}`}>
-                {decodeHtmlEntities(song.title)}
-            </h4>
-            <p className="text-xs text-slate-500 truncate mt-0.5">
-                {decodeHtmlEntities(song.subtitle || song.album)}
-            </p>
-        </div>
-
-        <div className="hidden md:flex items-center gap-2 text-xs text-slate-400">
-            <span className="opacity-80">{parseInt(song.play_count || 0).toLocaleString()}</span>
-        </div>
-
-        <div className="hidden md:block text-xs text-slate-400 font-bold w-12 text-right">
-            {song.more_info?.duration ? (
-                `${Math.floor(song.more_info.duration / 60)}:${(song.more_info.duration % 60).toString().padStart(2, '0')}`
-            ) : '-'}
-        </div>
-
-        <TrackMenu song={song} className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all z-10 ml-2" />
-    </div>
-);
-
-const AlbumCard = ({ item, typeOverride }) => {
-    const type = typeOverride || item.type || 'album';
-    const id = extractIdFromUrl(item.perma_url) || item.id;
-    const isArtist = type === 'artist';
-    let route = `/album/${id}`;
-    if (type === 'artist') route = `/artist/${id}`;
-
-    return (
-        <Link
-            to={route}
-            className="group cursor-pointer flex flex-col gap-3"
-        >
-            <div className={`aspect-square overflow-hidden relative shadow-lg group-hover:shadow-xl transition-all duration-500 z-10 ${isArtist ? 'rounded-full' : 'rounded-2xl'}`}>
-                <img
-                    src={getHighQualityImage(item.image)}
-                    alt={item.title || item.name}
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-[1px]">
-                    <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 text-white shadow-xl scale-50 group-hover:scale-100 transition-all duration-300 hover:bg-primary hover:border-primary">
-                        <span className="material-icons-round text-3xl ml-1">
-                            {isArtist ? 'person' : 'play_arrow'}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div className="px-1 text-center">
-                <h4 className="font-bold text-slate-800 dark:text-slate-100 truncate text-sm group-hover:text-primary transition-colors">
-                    {item.title || item.name}
-                </h4>
-                <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
-                    {item.year || item.subtitle || (type === 'artist' ? 'Artist' : 'Album')}
-                </p>
-            </div>
-        </Link>
-    );
-};
-
-
-// --- Main Page Component ---
+import TrackMenu from '../components/common/TrackMenu';
 
 export default function Artist() {
     const { id } = useParams();
@@ -122,26 +13,33 @@ export default function Artist() {
     const dispatch = useAppDispatch();
     const [artistData, setArtistData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [playingTrack, setPlayingTrack] = useState(null);
     const [activeTab, setActiveTab] = useState('overview');
+    const [allSongs, setAllSongs] = useState([]);
+    const [allAlbums, setAllAlbums] = useState([]);
+    const [songsPage, setSongsPage] = useState(0);
+    const [albumsPage, setAlbumsPage] = useState(0);
+    const [loadingSongs, setLoadingSongs] = useState(false);
+    const [loadingAlbums, setLoadingAlbums] = useState(false);
+    const [hasMoreSongs, setHasMoreSongs] = useState(true);
+    const [hasMoreAlbums, setHasMoreAlbums] = useState(true);
+    const { currentTrack } = useAppSelector((state) => state.player);
     const containerRef = useRef(null);
 
-    // Scroll to top when ID changes
     useEffect(() => {
         if (containerRef.current) {
             containerRef.current.scrollTo(0, 0);
         }
-        setActiveTab('overview'); // Reset tab on navigation
     }, [id]);
 
     useEffect(() => {
         const fetchArtistDetails = async () => {
             setLoading(true);
             try {
-                if (!id) return;
-                const response = await fetch(`${API_URL}/details/${id}/artist`);
+                const response = await fetch(`${API_URL}/artist/${id}`);
                 const data = await response.json();
                 setArtistData(data);
+                setAllSongs(data.topSongs || []);
+                setAllAlbums(data.topAlbums || []);
             } catch (error) {
                 console.error("Error fetching artist details:", error);
             } finally {
@@ -151,29 +49,182 @@ export default function Artist() {
 
         if (id) {
             fetchArtistDetails();
+            setSongsPage(0);
+            setAlbumsPage(0);
+            setHasMoreSongs(true);
+            setHasMoreAlbums(true);
         }
     }, [id]);
 
-    const handlePlayAll = () => {
-        if (artistData?.topSongs && artistData.topSongs.length > 0) {
-            dispatch(setQueue(artistData.topSongs));
-            dispatch(setCurrentTrack(artistData.topSongs[0]));
-            setPlayingTrack(artistData.topSongs[0].id);
+    const loadMoreSongs = async () => {
+        if (loadingSongs || !hasMoreSongs) return;
+
+        setLoadingSongs(true);
+        try {
+            const nextPage = songsPage + 1;
+            const response = await fetch(`${API_URL}/artist/${id}?p=${nextPage}&sub_type=songs&more=true`);
+            const data = await response.json();
+
+            if (data.topSongs && data.topSongs.length > 0) {
+                setAllSongs(prev => [...prev, ...data.topSongs]);
+                setSongsPage(nextPage);
+            } else {
+                setHasMoreSongs(false);
+            }
+        } catch (error) {
+            console.error("Error loading more songs:", error);
+            setHasMoreSongs(false);
+        } finally {
+            setLoadingSongs(false);
         }
     };
 
-    const handlePlaySong = (song, index) => {
-        dispatch(setQueue(artistData.topSongs)); // Use available songs context or fetch full song list if needed
-        dispatch(setCurrentTrack(song));
-        setPlayingTrack(song.id);
+    const loadMoreAlbums = async () => {
+        if (loadingAlbums || !hasMoreAlbums) return;
+
+        setLoadingAlbums(true);
+        try {
+            const nextPage = albumsPage + 1;
+            const response = await fetch(`${API_URL}/artist/${id}?p=${nextPage}&sub_type=albums&more=true`);
+            const data = await response.json();
+
+            if (data.topAlbums && data.topAlbums.length > 0) {
+                setAllAlbums(prev => [...prev, ...data.topAlbums]);
+                setAlbumsPage(nextPage);
+            } else {
+                setHasMoreAlbums(false);
+            }
+        } catch (error) {
+            console.error("Error loading more albums:", error);
+            setHasMoreAlbums(false);
+        } finally {
+            setLoadingAlbums(false);
+        }
     };
+
+    const formatDuration = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    const formatFollowers = (count) => {
+        const num = parseInt(count);
+        if (num >= 1000000) {
+            return `${(num / 1000000).toFixed(1)}M`;
+        } else if (num >= 1000) {
+            return `${(num / 1000).toFixed(1)}K`;
+        }
+        return num.toString();
+    };
+
+    const handlePlaySong = (song, index) => {
+        if (allSongs) {
+            dispatch(setQueue(allSongs));
+            dispatch(setCurrentTrack(song));
+        }
+    };
+
+    const handlePlayAll = () => {
+        if (allSongs && allSongs.length > 0) {
+            dispatch(setQueue(allSongs));
+            dispatch(setCurrentTrack(allSongs[0]));
+        }
+    };
+
+    const SongRow = ({ song, index }) => (
+        <div
+            key={song.id}
+            className={`group relative flex items-center gap-4 p-3 md:p-4 rounded-2xl transition-all cursor-pointer ${currentTrack?.id?.toString() === song.id?.toString()
+                ? 'bg-gradient-to-r from-primary/20 to-purple-500/20 dark:from-primary/30 dark:to-purple-500/30 shadow-lg'
+                : 'hover:bg-white/40 dark:hover:bg-white/5'
+                }`}
+            onClick={() => handlePlaySong(song, index)}
+        >
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl"></div>
+
+            {/* Index / Play Button */}
+            <div className="hidden md:flex relative w-12 h-12 items-center justify-center shrink-0 z-10">
+                {currentTrack?.id?.toString() === song.id?.toString() ? (
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                        <span className="material-icons-round text-white animate-pulse">graphic_eq</span>
+                    </div>
+                ) : (
+                    <>
+                        <span className="text-slate-400 font-bold group-hover:hidden">{index + 1}</span>
+                        <button className="hidden group-hover:flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white hover:scale-110 transition-transform shadow-lg">
+                            <span className="material-icons-round">play_arrow</span>
+                        </button>
+                    </>
+                )}
+            </div>
+
+            {/* Song Image */}
+            <div className="relative w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden shrink-0 shadow-md group-hover:shadow-xl transition-shadow z-10">
+                <img
+                    src={getHighQualityImage(song.image)}
+                    alt={song.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors"></div>
+            </div>
+
+            {/* Song Info */}
+            <div className="flex-1 min-w-0 z-10">
+                <h4 className={`font-bold text-sm md:text-base truncate transition-colors ${currentTrack?.id?.toString() === song.id?.toString()
+                    ? 'text-primary'
+                    : 'text-slate-800 dark:text-slate-100 group-hover:text-primary'
+                    }`}>
+                    {decodeHtmlEntities(song.title)}
+                </h4>
+                <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 truncate">
+                    {decodeHtmlEntities(song.subtitle)}
+                </p>
+            </div>
+
+            {/* Duration */}
+            <div className="hidden md:block text-sm text-slate-400 font-medium w-16 text-right z-10">
+                {formatDuration(parseInt(song.more_info?.duration || 0))}
+            </div>
+
+            {/* Menu */}
+            <TrackMenu song={song} className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all z-10" />
+        </div>
+    );
+
+    const AlbumCard = ({ album }) => (
+        <Link
+            key={album.id}
+            to={`/album/${extractIdFromUrl(album.perma_url) || album.id}`}
+            className="group cursor-pointer flex flex-col gap-3"
+        >
+            <div className="aspect-square rounded-2xl overflow-hidden relative shadow-lg group-hover:shadow-2xl transition-all duration-500">
+                <img
+                    src={getHighQualityImage(album.image)}
+                    alt={album.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                    <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                        <span className="material-icons-round text-white text-2xl ml-0.5">play_arrow</span>
+                    </div>
+                </div>
+            </div>
+            <div className="px-1">
+                <h4 className="font-bold text-slate-800 dark:text-slate-100 truncate text-sm md:text-base group-hover:text-primary transition-colors">
+                    {decodeHtmlEntities(album.title)}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1">{album.year}</p>
+            </div>
+        </Link>
+    );
 
     if (loading) {
         return (
             <div className="flex-1 flex items-center justify-center h-full">
                 <div className="relative">
-                    <div className="w-16 h-16 border-4 border-slate-200 dark:border-slate-800 rounded-full"></div>
-                    <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                    <div className="w-20 h-20 border-4 border-slate-200 dark:border-slate-800 rounded-full"></div>
+                    <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
                 </div>
             </div>
         );
@@ -182,226 +233,298 @@ export default function Artist() {
     if (!artistData) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 text-slate-500">
-                <span className="material-icons-round text-6xl opacity-20">person_off</span>
+                <span className="material-icons-round text-6xl opacity-20">person</span>
                 <p>Artist not found</p>
                 <button onClick={() => navigate(-1)} className="text-primary hover:underline">Go Back</button>
             </div>
         );
     }
 
-    // Extract Listeners count
-    let listenersCount = null;
-    if (artistData.subtitle && artistData.subtitle.includes('Listeners')) {
-        const parts = artistData.subtitle.split('•');
-        if (parts.length > 1) {
-            listenersCount = parts[1].trim();
-        }
-    }
-
-    // --- Tab Views ---
-
-    const renderOverview = () => (
-        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Top Songs & Bio Split */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                <div className="xl:col-span-2">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-2xl font-bold text-slate-800 dark:text-white">Top Songs</h3>
-                        <button onClick={() => setActiveTab('songs')} className="text-sm font-bold text-primary hover:underline">View All</button>
-                    </div>
-                    <div className="space-y-1">
-                        {artistData.topSongs?.map((song, index) => (
-                            <SongRow key={song.id} song={song} index={index} playingTrack={playingTrack} onPlay={handlePlaySong} />
-                        ))}
-                    </div>
-                </div>
-
-                <div className="space-y-6">
-                    {/* Bio Card */}
-                    <div className="glass-panel-light dark:glass-panel bg-white/50 dark:bg-white/5 p-6 rounded-3xl h-full border border-gray-100 dark:border-white/5">
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="material-icons-round text-2xl text-slate-400">auto_stories</span>
-                            <h3 className="text-lg font-bold text-slate-800 dark:text-white">Profile</h3>
-                        </div>
-                        {artistData.bio && (artistData.bio.length > 0 || Array.isArray(artistData.bio)) ? (
-                            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-[8]">
-                                {Array.isArray(artistData.bio) ? artistData.bio[0]?.text : artistData.bio}
-                            </p>
-                        ) : (
-                            <p className="text-sm text-slate-500">No biography available.</p>
-                        )}
-                        {artistData.dob && (
-                            <div className="mt-4 pt-4 border-t border-slate-200 dark:border-white/10 flex justify-between text-sm">
-                                <span className="text-slate-500">Born</span>
-                                <span className="font-semibold text-slate-800 dark:text-slate-200">{artistData.dob}</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Albums Slider */}
-            {artistData.topAlbums && artistData.topAlbums.length > 0 && (
-                <section>
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-2xl font-bold text-slate-800 dark:text-white">Top Albums</h3>
-                        <button onClick={() => setActiveTab('albums')} className="text-sm font-bold text-primary hover:underline">View More</button>
-                    </div>
-                    <div className="flex gap-6 overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory -mx-2 px-6">
-                        {artistData.topAlbums.map((album) => (
-                            <div key={album.id} className="w-48 shrink-0 snap-center">
-                                <AlbumCard item={album} />
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            )}
-
-            {/* Singles Slider */}
-            {artistData.singles && artistData.singles.length > 0 && (
-                <section>
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-2xl font-bold text-slate-800 dark:text-white">Singles</h3>
-                        <button onClick={() => setActiveTab('singles')} className="text-sm font-bold text-primary hover:underline">View More</button>
-                    </div>
-                    <div className="flex gap-6 overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory -mx-2 px-6">
-                        {artistData.singles.map((single) => (
-                            <div key={single.id} className="w-48 shrink-0 snap-center">
-                                <AlbumCard item={single} />
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            )}
-
-            {/* Similar Artists */}
-            {artistData.similarArtists && artistData.similarArtists.length > 0 && (
-                <section>
-                    <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">Fans Also Like</h3>
-                    <div className="flex gap-6 overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory -mx-2 px-6">
-                        {artistData.similarArtists.map((artist) => (
-                            <div key={artist.id} className="w-40 shrink-0 snap-center">
-                                <AlbumCard item={artist} typeOverride="artist" />
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            )}
-        </div>
-    );
-
-    const renderSongsTab = () => (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-slate-800 dark:text-white">All Songs</h3>
-            </div>
-            <div className="space-y-1">
-                {artistData.topSongs?.map((song, index) => (
-                    <SongRow key={song.id} song={song} index={index} playingTrack={playingTrack} onPlay={handlePlaySong} />
-                ))}
-            </div>
-            {(!artistData.topSongs || artistData.topSongs.length === 0) && (
-                <div className="text-center py-20 text-slate-500">No songs available</div>
-            )}
-        </div>
-    );
-
-    const renderGridTab = (items, title, type = 'album') => (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-slate-800 dark:text-white">{title}</h3>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {items?.map((item) => (
-                    <AlbumCard key={item.id} item={item} typeOverride={type} />
-                ))}
-            </div>
-            {(!items || items.length === 0) && (
-                <div className="text-center py-20 text-slate-500">No content available</div>
-            )}
-        </div>
-    );
-
-
     return (
-        <div ref={containerRef} className="flex-1 overflow-y-auto pr-2 hide-scrollbar pb-32">
+        <div ref={containerRef} className="flex-1 overflow-y-auto pr-2 hide-scrollbar pb-24">
             {/* Hero Section */}
-            <div className="relative rounded-[2.5rem] overflow-hidden mb-8 shadow-2xl shadow-black/20">
-                {/* Background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 dark:from-indigo-500/30 dark:via-purple-500/30 dark:to-pink-500/30">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-60 animate-blob"></div>
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-pink-500/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-60 animate-blob animation-delay-2000"></div>
-                    <div className="absolute inset-0 bg-black/5 dark:bg-black/20 backdrop-blur-[1px]"></div>
+            <div className="relative mb-8 rounded-3xl overflow-hidden bg-gradient-to-br from-primary/20 via-purple-500/20 to-pink-500/20 dark:from-primary/30 dark:via-purple-500/30 dark:to-pink-500/30">
+                {/* Background Effects */}
+                <div className="absolute inset-0">
+                    <div className="absolute top-0 left-0 w-96 h-96 bg-primary/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-70 animate-blob"></div>
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+                    <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-pink-500/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
                 </div>
 
-                <div className="relative z-10 px-6 md:px-12 py-10">
-                    <div className="flex flex-col md:flex-row gap-8 items-center md:items-end text-center md:text-left">
-                        {/* Image */}
-                        <div className="shrink-0 w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden shadow-2xl ring-4 ring-white/20">
-                            <img
-                                src={getHighQualityImage(artistData.image)}
-                                alt={artistData.name}
-                                className="w-full h-full object-cover scale-105"
-                            />
+                {/* Content */}
+                <div className="relative z-10 px-6 md:px-12 py-12 md:py-16">
+                    <div className="flex flex-col md:flex-row gap-8 items-center md:items-end">
+                        {/* Artist Image */}
+                        <div className="shrink-0 group">
+                            <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden shadow-2xl ring-4 ring-white/20">
+                                <img
+                                    src={getHighQualityImage(artistData.image)}
+                                    alt={artistData.name}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                            </div>
                         </div>
 
-                        {/* Details */}
-                        <div className="flex-1 pb-4">
+                        {/* Artist Info */}
+                        <div className="flex-1 text-center md:text-left">
+                            {/* Verified Badge */}
                             {artistData.isVerified && (
-                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-500 text-xs font-bold uppercase tracking-wider mb-4">
-                                    <span className="material-icons-round text-sm">verified</span>
-                                    Verified Artist
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg mb-4">
+                                    <span className="material-icons-round text-primary text-lg">verified</span>
+                                    <span className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-widest">Verified Artist</span>
                                 </div>
                             )}
 
-                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-slate-800 dark:text-white tracking-tighter sm:leading-none mb-4">
-                                {artistData.name}
+                            {/* Name */}
+                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-white mb-4 tracking-tighter leading-none">
+                                {decodeHtmlEntities(artistData.name)}
                             </h1>
 
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-8 text-slate-600 dark:text-slate-300">
-                                <span className="uppercase tracking-widest font-semibold text-sm">
-                                    {artistData.dominantType || 'Music Artist'}
-                                </span>
-                                {listenersCount && (
-                                    <>
-                                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                        <span className="font-medium">{listenersCount}</span>
-                                    </>
+                            {/* Stats */}
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 md:gap-6 text-sm md:text-base mb-6">
+                                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 dark:bg-white/10 backdrop-blur-md border border-white/20">
+                                    <span className="material-icons-round text-lg text-primary">people</span>
+                                    <span className="font-semibold text-slate-800 dark:text-white">{formatFollowers(artistData.follower_count)} Followers</span>
+                                </div>
+                                {artistData.dominantLanguage && (
+                                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 dark:bg-white/10 backdrop-blur-md border border-white/20">
+                                        <span className="material-icons-round text-lg text-primary">language</span>
+                                        <span className="font-semibold text-slate-800 dark:text-white capitalize">{artistData.dominantLanguage}</span>
+                                    </div>
+                                )}
+                                {artistData.dominantType && (
+                                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 dark:bg-white/10 backdrop-blur-md border border-white/20">
+                                        <span className="material-icons-round text-lg text-primary">music_note</span>
+                                        <span className="font-semibold text-slate-800 dark:text-white capitalize">{artistData.dominantType}</span>
+                                    </div>
                                 )}
                             </div>
 
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                            {/* Action Buttons */}
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                                 <button
                                     onClick={handlePlayAll}
-                                    className="bg-primary hover:bg-primary-focus text-white h-12 px-8 rounded-full font-bold flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/25"
+                                    className="group relative bg-gradient-to-r from-primary to-purple-500 hover:from-primary-focus hover:to-purple-600 text-white h-14 px-8 rounded-full font-bold text-base transition-all shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:scale-105 active:scale-95 flex items-center gap-3 overflow-hidden"
                                 >
-                                    <span className="material-icons-round text-2xl">play_circle</span>
-                                    Play All
+                                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                                    <span className="material-icons-round text-2xl relative z-10">play_circle_filled</span>
+                                    <span className="relative z-10">Play All</span>
                                 </button>
-                                <button className="h-12 w-12 rounded-full border border-slate-300 dark:border-white/20 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 transition-colors">
-                                    <span className="material-icons-round text-slate-600 dark:text-slate-200">favorite_border</span>
+                                <button className="w-14 h-14 rounded-full bg-white/10 dark:bg-white/5 backdrop-blur-md border border-white/10 text-slate-800 dark:text-white flex items-center justify-center hover:bg-white/20 dark:hover:bg-white/10 hover:scale-110 hover:border-primary hover:text-primary active:scale-95 transition-all shadow-lg">
+                                    <span className="material-icons-round text-xl">favorite_border</span>
                                 </button>
-                                <AlbumMenu data={{ list: artistData.topSongs }} />
+                                <button className="w-14 h-14 rounded-full bg-white/10 dark:bg-white/5 backdrop-blur-md border border-white/10 text-slate-800 dark:text-white flex items-center justify-center hover:bg-white/20 dark:hover:bg-white/10 hover:scale-110 hover:border-primary hover:text-primary active:scale-95 transition-all shadow-lg">
+                                    <span className="material-icons-round text-xl">share</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-xl z-30 -mx-2 px-6 py-4 mb-2 border-b border-gray-200 dark:border-white/10 flex gap-2 overflow-x-auto hide-scrollbar">
-                <TabButton active={activeTab === 'overview'} label="Overview" onClick={() => setActiveTab('overview')} />
-                <TabButton active={activeTab === 'songs'} label="Songs" onClick={() => setActiveTab('songs')} />
-                <TabButton active={activeTab === 'albums'} label="Albums" onClick={() => setActiveTab('albums')} />
+            {/* Tabs */}
+            <div className="mb-8">
+                <div className="flex items-center gap-2 p-1 bg-white/40 dark:bg-white/5 rounded-2xl border border-white/20 dark:border-white/10 backdrop-blur-md w-fit">
+                    <button
+                        onClick={() => setActiveTab('overview')}
+                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'overview'
+                            ? 'bg-gradient-to-r from-primary to-purple-500 text-white shadow-lg'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                            }`}
+                    >
+                        Overview
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('songs')}
+                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'songs'
+                            ? 'bg-gradient-to-r from-primary to-purple-500 text-white shadow-lg'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                            }`}
+                    >
+                        Songs
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('albums')}
+                        className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'albums'
+                            ? 'bg-gradient-to-r from-primary to-purple-500 text-white shadow-lg'
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                            }`}
+                    >
+                        Albums
+                    </button>
+                </div>
             </div>
 
             {/* Tab Content */}
-            <div className="mt-6 min-h-[400px]">
-                {activeTab === 'overview' && renderOverview()}
-                {activeTab === 'songs' && renderSongsTab()}
-                {activeTab === 'albums' && renderGridTab(artistData.topAlbums, 'Albums', 'album')}
-            </div>
+            {activeTab === 'overview' && (
+                <>
+                    {/* Top Songs */}
+                    {artistData.topSongs && artistData.topSongs.length > 0 && (
+                        <div className="mb-8">
+                            <div className="flex items-center justify-between mb-4 px-2">
+                                <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+                                    <span className="w-1 h-8 bg-gradient-to-b from-primary to-purple-500 rounded-full"></span>
+                                    Top Songs
+                                </h2>
+                            </div>
+                            <div className="space-y-2">
+                                {artistData.topSongs.slice(0, 10).map((song, index) => (
+                                    <SongRow key={song.id} song={song} index={index} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
+                    {/* Albums */}
+                    {artistData.topAlbums && artistData.topAlbums.length > 0 && (
+                        <div className="mb-8">
+                            <div className="flex items-center justify-between mb-4 px-2">
+                                <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+                                    <span className="w-1 h-8 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></span>
+                                    Top Albums
+                                </h2>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                                {artistData.topAlbums.map((album) => (
+                                    <AlbumCard key={album.id} album={album} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Playlists */}
+                    {artistData.dedicated_artist_playlist && artistData.dedicated_artist_playlist.length > 0 && (
+                        <div className="mb-8">
+                            <div className="flex items-center justify-between mb-4 px-2">
+                                <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+                                    <span className="w-1 h-8 bg-gradient-to-b from-pink-500 to-orange-500 rounded-full"></span>
+                                    Featured Playlists
+                                </h2>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                                {artistData.dedicated_artist_playlist.slice(0, 8).map((playlist) => (
+                                    <Link
+                                        key={playlist.id}
+                                        to={`/playlist/${extractIdFromUrl(playlist.perma_url) || playlist.id}`}
+                                        className="group cursor-pointer flex flex-col gap-3"
+                                    >
+                                        <div className="aspect-square rounded-2xl overflow-hidden relative shadow-lg group-hover:shadow-2xl transition-all duration-500">
+                                            <img
+                                                src={getHighQualityImage(playlist.image)}
+                                                alt={playlist.title}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                                    <span className="material-icons-round text-white text-2xl ml-0.5">play_arrow</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="px-1">
+                                            <h4 className="font-bold text-slate-800 dark:text-slate-100 truncate text-sm md:text-base group-hover:text-primary transition-colors">
+                                                {decodeHtmlEntities(playlist.title)}
+                                            </h4>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1">{playlist.subtitle}</p>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Singles */}
+                    {artistData.singles && artistData.singles.length > 0 && (
+                        <div className="mb-8">
+                            <div className="flex items-center justify-between mb-4 px-2">
+                                <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+                                    <span className="w-1 h-8 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-full"></span>
+                                    Singles
+                                </h2>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                                {artistData.singles.slice(0, 10).map((single) => (
+                                    <AlbumCard key={single.id} album={single} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </>
+            )}
+
+            {activeTab === 'songs' && (
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4 px-2">
+                        <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+                            <span className="w-1 h-8 bg-gradient-to-b from-primary to-purple-500 rounded-full"></span>
+                            All Songs
+                        </h2>
+                    </div>
+                    <div className="space-y-2">
+                        {allSongs.map((song, index) => (
+                            <SongRow key={song.id} song={song} index={index} />
+                        ))}
+                    </div>
+                    {hasMoreSongs && (
+                        <div className="flex justify-center mt-8">
+                            <button
+                                onClick={loadMoreSongs}
+                                disabled={loadingSongs}
+                                className="px-8 py-4 rounded-full bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 text-slate-800 dark:text-white font-bold hover:bg-white/60 dark:hover:bg-white/10 hover:border-primary hover:text-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                {loadingSongs ? (
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Loading...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="material-icons-round">expand_more</span>
+                                        <span>Load More</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {activeTab === 'albums' && (
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4 px-2">
+                        <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+                            <span className="w-1 h-8 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></span>
+                            All Albums
+                        </h2>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                        {allAlbums.map((album) => (
+                            <AlbumCard key={album.id} album={album} />
+                        ))}
+                    </div>
+                    {hasMoreAlbums && (
+                        <div className="flex justify-center mt-8">
+                            <button
+                                onClick={loadMoreAlbums}
+                                disabled={loadingAlbums}
+                                className="px-8 py-4 rounded-full bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 text-slate-800 dark:text-white font-bold hover:bg-white/60 dark:hover:bg-white/10 hover:border-primary hover:text-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                {loadingAlbums ? (
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Loading...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="material-icons-round">expand_more</span>
+                                        <span>Load More</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
