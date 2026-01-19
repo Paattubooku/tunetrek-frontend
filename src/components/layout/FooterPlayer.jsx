@@ -32,43 +32,41 @@ export default function FooterPlayer() {
 
     // --- Media Session API Configuration ---
 
-    // 1. Set Action Handlers (Run once to ensure buttons persist)
+    // 1. Set Action Handlers (Run whenever track changes to ensure persistence)
     useEffect(() => {
-        if (!('mediaSession' in navigator)) return;
+        if (!currentTrack || !('mediaSession' in navigator)) return;
 
         try {
-            // Explicitly unset ALL seek/skip handlers to force Prev/Next buttons
-            navigator.mediaSession.setActionHandler('seekto', null);
-            navigator.mediaSession.setActionHandler('seekbackward', null);
-            navigator.mediaSession.setActionHandler('seekforward', null);
-
             // Play/Pause
             navigator.mediaSession.setActionHandler('play', () => dispatch(setPlaying(true)));
             navigator.mediaSession.setActionHandler('pause', () => dispatch(setPlaying(false)));
             navigator.mediaSession.setActionHandler('stop', () => dispatch(setPlaying(false)));
 
-            // Next/Prev
+            // Next/Prev (Vital for Lock Screen)
             navigator.mediaSession.setActionHandler('previoustrack', () => dispatch(previousTrack()));
             navigator.mediaSession.setActionHandler('nexttrack', () => dispatch(nextTrack()));
+
+            // Seek (Scrubbing) - Enabling this usually helps iOS see it as "Music" not "Live Radio"
+            navigator.mediaSession.setActionHandler('seekto', (details) => {
+                if (details.seekTime && audioRef.current) {
+                    audioRef.current.currentTime = details.seekTime;
+                }
+            });
+
+            // Explicitly unset skip buttons
+            navigator.mediaSession.setActionHandler('seekbackward', null);
+            navigator.mediaSession.setActionHandler('seekforward', null);
 
         } catch (error) {
             console.warn('Media Session Action registration failed:', error);
         }
 
         return () => {
-            // Cleanup on unmount only
-            if ('mediaSession' in navigator) {
-                try {
-                    navigator.mediaSession.setActionHandler('play', null);
-                    navigator.mediaSession.setActionHandler('pause', null);
-                    navigator.mediaSession.setActionHandler('stop', null);
-                    navigator.mediaSession.setActionHandler('previoustrack', null);
-                    navigator.mediaSession.setActionHandler('nexttrack', null);
-                    navigator.mediaSession.setActionHandler('seekto', null);
-                } catch (e) { /* ignore */ }
-            }
+            // We don't need to aggressively cleanup here as we are re-setting them immediately
+            // but strictly speaking, we can leave them be or null them. 
+            // Leaving them persists them between renders which is often better.
         };
-    }, [dispatch]);
+    }, [dispatch, currentTrack]); // Added currentTrack dependency
 
     // 2. Update Metadata (Run only when track changes)
     useEffect(() => {
