@@ -403,49 +403,49 @@ export default function AlbumDetails() {
                 {/* Right Column - Album Info & Artists */}
                 <div className="space-y-6">
                     {/* Album Information Card */}
-                    <div className="glass-panel-light dark:glass-panel bg-glass-light dark:bg-glass-dark p-6 rounded-3xl animate-in fade-in slide-in-from-right-4 duration-500 delay-500">
+                    <div className="glass-panel-light dark:glass-panel bg-glass-light dark:bg-[#0f172a]/60 backdrop-blur-xl p-6 rounded-3xl animate-in fade-in slide-in-from-right-4 duration-500 delay-500 border border-white/20 dark:border-white/5">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-lg shadow-primary/20">
                                 <span className="material-icons-round text-white text-xl">info</span>
                             </div>
                             <h3 className="text-xl font-bold text-slate-800 dark:text-white">Album Info</h3>
                         </div>
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/30 dark:bg-white/5">
-                                <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                                    <span className="material-icons-round text-lg">calendar_today</span>
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
+                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
+                                    <span className="material-icons-round text-lg opacity-70">calendar_today</span>
                                     Release Date
                                 </span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">{albumData.year}</span>
+                                <span className="font-bold text-slate-800 dark:text-white">{albumData.year}</span>
                             </div>
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/30 dark:bg-white/5">
-                                <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                                    <span className="material-icons-round text-lg">music_note</span>
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
+                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
+                                    <span className="material-icons-round text-lg opacity-70">music_note</span>
                                     Total Tracks
                                 </span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">{albumData.list_count}</span>
+                                <span className="font-bold text-slate-800 dark:text-white">{albumData.list_count}</span>
                             </div>
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/30 dark:bg-white/5">
-                                <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                                    <span className="material-icons-round text-lg">schedule</span>
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
+                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
+                                    <span className="material-icons-round text-lg opacity-70">schedule</span>
                                     Duration
                                 </span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">{getTotalDuration()}</span>
+                                <span className="font-bold text-slate-800 dark:text-white">{getTotalDuration()}</span>
                             </div>
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/30 dark:bg-white/5">
-                                <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                                    <span className="material-icons-round text-lg">language</span>
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
+                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
+                                    <span className="material-icons-round text-lg opacity-70">language</span>
                                     Language
                                 </span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200 capitalize">{albumData.language}</span>
+                                <span className="font-bold text-slate-800 dark:text-white capitalize">{albumData.language}</span>
                             </div>
                             {albumData.more_info?.label && (
-                                <div className="p-3 rounded-xl bg-white/30 dark:bg-white/5">
-                                    <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 mb-2">
-                                        <span className="material-icons-round text-lg">label</span>
+                                <div className="p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
+                                    <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 mb-2 font-medium">
+                                        <span className="material-icons-round text-lg opacity-70">label</span>
                                         Label
                                     </span>
-                                    <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">{albumData.more_info.label}</span>
+                                    <span className="font-bold text-slate-800 dark:text-white text-sm block truncate">{albumData.more_info.label}</span>
                                 </div>
                             )}
                         </div>
@@ -453,9 +453,9 @@ export default function AlbumDetails() {
 
                     {/* Artists Card */}
                     {albumData.more_info?.artistMap?.primary_artists && (
-                        <div className="glass-panel-light dark:glass-panel bg-glass-light dark:bg-glass-dark p-6 rounded-3xl animate-in fade-in slide-in-from-right-4 duration-500 delay-600">
+                        <div className="glass-panel-light dark:glass-panel bg-glass-light dark:bg-[#0f172a]/60 backdrop-blur-xl p-6 rounded-3xl animate-in fade-in slide-in-from-right-4 duration-500 delay-600 border border-white/20 dark:border-white/5">
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
                                     <span className="material-icons-round text-white text-xl">person</span>
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-800 dark:text-white">Artists</h3>
@@ -465,13 +465,13 @@ export default function AlbumDetails() {
                                     <Link
                                         key={artist.id}
                                         to={`/${artist.type}/${extractIdFromUrl(artist.perma_url)}`}
-                                        className="flex items-center gap-3 p-3 rounded-xl bg-white/30 dark:bg-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-all group"
+                                        className="flex items-center gap-3 p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 transition-all group"
                                     >
                                         {artist.image ? (
                                             <img
                                                 src={getHighQualityImage(artist.image)}
                                                 alt={artist.name}
-                                                className="w-12 h-12 rounded-full object-cover ring-2 ring-white/20 group-hover:ring-primary transition-all"
+                                                className="w-12 h-12 rounded-full object-cover ring-2 ring-white/10 group-hover:ring-primary transition-all"
                                             />
                                         ) : (
                                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center">
@@ -479,10 +479,10 @@ export default function AlbumDetails() {
                                             </div>
                                         )}
                                         <div className="flex-1 min-w-0">
-                                            <span className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-primary transition-colors block truncate">
+                                            <span className="font-bold text-slate-800 dark:text-white group-hover:text-primary transition-colors block truncate">
                                                 {artist.name}
                                             </span>
-                                            <span className="text-xs text-slate-500 dark:text-slate-400 capitalize">{artist.role || 'Artist'}</span>
+                                            <span className="text-xs text-slate-500 dark:text-slate-400 capitalize bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full mt-1 inline-block">{artist.role || 'Artist'}</span>
                                         </div>
                                         <span className="material-icons-round text-slate-400 group-hover:text-primary transition-colors">chevron_right</span>
                                     </Link>

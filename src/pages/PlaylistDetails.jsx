@@ -381,37 +381,37 @@ export default function PlaylistDetails() {
                 {/* Right Column - Playlist Info & Artists */}
                 <div className="space-y-6">
                     {/* Info Card */}
-                    <div className="glass-panel-light dark:glass-panel bg-glass-light dark:bg-glass-dark p-6 rounded-3xl animate-in fade-in slide-in-from-right-4 duration-500 delay-500">
+                    <div className="glass-panel-light dark:glass-panel bg-glass-light dark:bg-[#0f172a]/60 backdrop-blur-xl p-6 rounded-3xl animate-in fade-in slide-in-from-right-4 duration-500 delay-500 border border-white/20 dark:border-white/5">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-lg shadow-primary/20">
                                 <span className="material-icons-round text-white text-xl">info</span>
                             </div>
                             <h3 className="text-xl font-bold text-slate-800 dark:text-white">Info</h3>
                         </div>
                         <div className="space-y-4">
                             {playlistData.more_info?.uid && (
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/30 dark:bg-white/5">
-                                    <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                                        <span className="material-icons-round text-lg">person</span>
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
+                                    <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
+                                        <span className="material-icons-round text-lg opacity-70">person</span>
                                         Curator
                                     </span>
-                                    <span className="font-bold text-slate-800 dark:text-slate-200">{playlistData.more_info.firstname} {playlistData.more_info.lastname}</span>
+                                    <span className="font-bold text-slate-800 dark:text-white block truncate max-w-[120px]">{playlistData.more_info.firstname} {playlistData.more_info.lastname}</span>
                                 </div>
                             )}
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/30 dark:bg-white/5">
-                                <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                                    <span className="material-icons-round text-lg">favorite</span>
+                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
+                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
+                                    <span className="material-icons-round text-lg opacity-70">favorite</span>
                                     Followers
                                 </span>
-                                <span className="font-bold text-slate-800 dark:text-slate-200">{playlistData.more_info?.follower_count || '0'}</span>
+                                <span className="font-bold text-slate-800 dark:text-white">{playlistData.more_info?.follower_count || '0'}</span>
                             </div>
                             {playlistData.more_info?.last_updated && (
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/30 dark:bg-white/5">
-                                    <span className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2">
-                                        <span className="material-icons-round text-lg">update</span>
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
+                                    <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
+                                        <span className="material-icons-round text-lg opacity-70">update</span>
                                         Updated
                                     </span>
-                                    <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                                    <span className="font-bold text-slate-800 dark:text-white text-sm">
                                         {new Date(parseInt(playlistData.more_info.last_updated) * 1000).toLocaleDateString()}
                                     </span>
                                 </div>
