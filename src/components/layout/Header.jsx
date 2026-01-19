@@ -139,7 +139,7 @@ export default function Header() {
     const hasResults = Object.keys(searchResults).length > 0;
 
     return (
-        <header className="glass-panel-light dark:glass-panel bg-glass-light dark:bg-glass-dark p-4 rounded-2xl flex items-center justify-between relative shrink-0 gap-4 z-30">
+        <header className="sticky top-0 z-40 glass-panel-light dark:glass-panel bg-white/80 dark:bg-[#0a192f]/80 backdrop-blur-xl p-4 rounded-2xl flex items-center justify-between relative shrink-0 gap-4 transition-all duration-300 border border-white/20 dark:border-white/5 shadow-lg shadow-black/5">
 
             {/* Left: Logo (Mobile) & Breadcrumbs (Desktop) */}
             <div className={`flex items-center gap-4 transition-opacity duration-300 ${isSearchOpen ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}>
@@ -148,7 +148,6 @@ export default function Header() {
                     <div className="bg-primary p-1.5 rounded-lg text-white shadow-lg shadow-primary/30">
                         <span className="material-icons-round text-lg">graphic_eq</span>
                     </div>
-                    <span className="text-lg font-black tracking-tight text-slate-800 dark:text-white">TuneTrek</span>
                 </Link>
 
                 <div className="flex gap-2 shrink-0">
@@ -197,7 +196,7 @@ export default function Header() {
                         className={`
                             relative w-full h-11 flex items-center rounded-2xl overflow-hidden transition-all duration-300
                             ${isSearchOpen
-                                ? 'bg-white dark:bg-[#1E1E1E] shadow-2xl shadow-black/20 ring-1 ring-black/5 dark:ring-white/10'
+                                ? 'bg-white dark:bg-[#112240] shadow-2xl shadow-black/20 ring-1 ring-black/5 dark:ring-white/10'
                                 : 'bg-transparent md:bg-black/5 md:dark:bg-white/10 md:hover:bg-black/10 md:dark:hover:bg-white/15'
                             }
                         `}
@@ -344,7 +343,7 @@ export default function Header() {
 
                 {/* Profile / Login */}
                 {localStorage.getItem('token') ? (
-                    <div className="relative" ref={profileRef}>
+                    <div className={`relative ${isSearchOpen ? 'hidden md:block' : ''}`} ref={profileRef}>
                         <div
                             className="w-10 h-10 rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden border-2 border-white/20 shrink-0 z-20 relative cursor-pointer hover:border-primary transition-colors flex items-center justify-center bg-gradient-to-br from-primary to-purple-600 shadow-lg shadow-primary/20"
                             onClick={() => {
