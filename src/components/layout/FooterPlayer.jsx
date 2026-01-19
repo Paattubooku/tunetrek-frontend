@@ -67,20 +67,6 @@ export default function FooterPlayer() {
                 dispatch(nextTrack());
             });
 
-            navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-                const skipTime = details.seekOffset || 10;
-                if (audioRef.current) {
-                    audioRef.current.currentTime = Math.max(audioRef.current.currentTime - skipTime, 0);
-                }
-            });
-
-            navigator.mediaSession.setActionHandler('seekforward', (details) => {
-                const skipTime = details.seekOffset || 10;
-                if (audioRef.current) {
-                    audioRef.current.currentTime = Math.min(audioRef.current.currentTime + skipTime, audioRef.current.duration || 0);
-                }
-            });
-
             navigator.mediaSession.setActionHandler('seekto', (details) => {
                 if (details.seekTime && audioRef.current) {
                     audioRef.current.currentTime = details.seekTime;
@@ -102,8 +88,6 @@ export default function FooterPlayer() {
                     navigator.mediaSession.setActionHandler('pause', null);
                     navigator.mediaSession.setActionHandler('previoustrack', null);
                     navigator.mediaSession.setActionHandler('nexttrack', null);
-                    navigator.mediaSession.setActionHandler('seekbackward', null);
-                    navigator.mediaSession.setActionHandler('seekforward', null);
                     navigator.mediaSession.setActionHandler('seekto', null);
                 } catch (e) {
                     // Ignore cleanup errors
