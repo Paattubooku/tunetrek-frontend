@@ -488,7 +488,7 @@ export default function AlbumDetails() {
                             </div>
                         </div>
                     )}
-                    )}
+
 
                     {/* Copyright */}
                     {albumData.more_info?.copyright_text && (
