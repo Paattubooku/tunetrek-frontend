@@ -504,11 +504,11 @@ export default function AlbumDetails() {
             {/* Modules Section - Related Content */}
             {
                 modulesData && modulesData.length > 0 && (
-                    <div className="space-y-8 mt-10">
+                    <div className="space-y-2 mt-2">
                         {modulesData.map((module, moduleIndex) => (
                             <div key={module.key} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${800 + moduleIndex * 100}ms` }}>
                                 {/* Module Header */}
-                                <div className="flex items-center justify-between mb-6 px-2">
+                                <div className="flex items-center justify-between mb-3 px-2">
                                     <h2 className="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
                                         <span className="w-1 h-8 bg-gradient-to-b from-pink-500 to-orange-500 rounded-full"></span>
                                         {module.title}
@@ -516,7 +516,7 @@ export default function AlbumDetails() {
                                 </div>
 
                                 {/* Module Content - Horizontal Scroll */}
-                                <div className="flex gap-6 overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory -mx-2 px-6">
+                                <div className="flex gap-6 overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory -mx-2 px-6">
                                     {module.data.map((item, itemIndex) => (
                                         <Link
                                             key={item.id || itemIndex}
