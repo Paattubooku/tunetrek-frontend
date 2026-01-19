@@ -37,33 +37,19 @@ export default function FooterPlayer() {
         if (!('mediaSession' in navigator)) return;
 
         try {
+            // Explicitly unset ALL seek/skip handlers to force Prev/Next buttons
+            navigator.mediaSession.setActionHandler('seekto', null);
+            navigator.mediaSession.setActionHandler('seekbackward', null);
+            navigator.mediaSession.setActionHandler('seekforward', null);
+
             // Play/Pause
             navigator.mediaSession.setActionHandler('play', () => dispatch(setPlaying(true)));
             navigator.mediaSession.setActionHandler('pause', () => dispatch(setPlaying(false)));
-            navigator.mediaSession.setActionHandler('stop', () => dispatch(setPlaying(false))); // Adding stop can act as a fallback
+            navigator.mediaSession.setActionHandler('stop', () => dispatch(setPlaying(false)));
 
             // Next/Prev
-            navigator.mediaSession.setActionHandler('previoustrack', () => dispatch(nextTrack()));
             navigator.mediaSession.setActionHandler('previoustrack', () => dispatch(previousTrack()));
-
-            // Correction: Ensure explicit handlers for both directions
-            navigator.mediaSession.setActionHandler('previoustrack', () => {
-                dispatch(previousTrack());
-            });
-            navigator.mediaSession.setActionHandler('nexttrack', () => {
-                dispatch(nextTrack());
-            });
-
-            // Seek (Scrubbing)
-            navigator.mediaSession.setActionHandler('seekto', (details) => {
-                if (details.seekTime && audioRef.current) {
-                    audioRef.current.currentTime = details.seekTime;
-                }
-            });
-
-            // Explicitly unset the seek handlers we don't want
-            navigator.mediaSession.setActionHandler('seekbackward', null);
-            navigator.mediaSession.setActionHandler('seekforward', null);
+            navigator.mediaSession.setActionHandler('nexttrack', () => dispatch(nextTrack()));
 
         } catch (error) {
             console.warn('Media Session Action registration failed:', error);
