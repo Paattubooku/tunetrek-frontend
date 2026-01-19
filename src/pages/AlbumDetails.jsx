@@ -193,7 +193,7 @@ export default function AlbumDetails() {
     }
 
     return (
-        <div ref={containerRef} className="flex-1 overflow-y-auto pr-2 hide-scrollbar pb-32">
+        <div ref={containerRef} className="flex-1 overflow-y-auto pr-2 hide-scrollbar pb-24">
             <style>{`
                 @keyframes loop-3d-tilt {
                     0%, 100% { transform: perspective(1000px) rotateY(-10deg) rotateX(5deg) scale(1); filter: brightness(1); }
@@ -504,7 +504,7 @@ export default function AlbumDetails() {
             {/* Modules Section - Related Content */}
             {
                 modulesData && modulesData.length > 0 && (
-                    <div className="space-y-12 mt-16">
+                    <div className="space-y-8 mt-10">
                         {modulesData.map((module, moduleIndex) => (
                             <div key={module.key} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${800 + moduleIndex * 100}ms` }}>
                                 {/* Module Header */}
