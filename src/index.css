@@ -25,6 +25,13 @@
     background-attachment: fixed;
     color: #f1f5f9;
   }
+  
+  /* Prevent automatic zoom on iOS inputs < 16px */
+  @media screen and (max-width: 768px) {
+    input, textarea, select {
+      font-size: 16px !important;
+    }
+  }
 }
 
 @layer utilities {
