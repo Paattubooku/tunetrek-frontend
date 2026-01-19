@@ -25,53 +25,6 @@ export default function Header() {
     const searchInputRef = useRef(null);
     const containerRef = useRef(null);
 
-    // New Search Features State
-    const [topSearches, setTopSearches] = useState([]);
-    const [recentSearches, setRecentSearches] = useState([]);
-
-    // Load recent searches
-    useEffect(() => {
-        try {
-            const saved = localStorage.getItem('recent_searches');
-            if (saved) setRecentSearches(JSON.parse(saved));
-        } catch (e) {
-            console.warn("Failed to load recent searches", e);
-        }
-    }, []);
-
-    // Fetch Top Searches
-    useEffect(() => {
-        if (isSearchOpen && topSearches.length === 0) {
-            const langParam = selectedLanguages.length > 0 ? selectedLanguages.join(',') : 'tamil,english';
-            fetch(`${API_URL}/top-searches?language=${langParam}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (Array.isArray(data)) setTopSearches(data);
-                })
-                .catch(e => console.error("Top searches fetch error:", e));
-        }
-    }, [isSearchOpen, selectedLanguages]);
-
-    const addToRecent = (item) => {
-        const newItem = {
-            id: item.id,
-            title: item.title,
-            type: item.type,
-            image: item.image,
-            url: item.url || '',
-            subtitle: item.subtitle
-        };
-
-        const updated = [newItem, ...recentSearches.filter(i => i.id !== item.id)].slice(0, 10);
-        setRecentSearches(updated);
-        localStorage.setItem('recent_searches', JSON.stringify(updated));
-    };
-
-    const clearRecent = () => {
-        setRecentSearches([]);
-        localStorage.removeItem('recent_searches');
-    };
-
     // Profile State
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [tempSelectedLanguages, setTempSelectedLanguages] = useState(selectedLanguages);
@@ -300,161 +253,87 @@ export default function Header() {
                     </div>
 
                     {/* Search Dropdown Results */}
-                    {isSearchOpen && (
+                    {isSearchOpen && searchQuery.length > 2 && (
                         <div className="absolute top-[calc(100%+12px)] left-0 right-0 bg-white/80 dark:bg-[#121212]/90 backdrop-blur-3xl border border-white/20 dark:border-white/5 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[60]">
                             <div className="flex flex-col max-h-[65vh] overflow-y-auto hide-scrollbar p-2">
-                                {searchQuery.length > 2 ? (
-                                    <>
-                                        {loading ? (
-                                            <div className="flex flex-col items-center justify-center py-12 text-slate-500">
-                                                <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin mb-3"></div>
-                                                <p className="text-xs font-medium tracking-wide">Searching Global Database...</p>
+                                {loading ? (
+                                    <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+                                        <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin mb-3"></div>
+                                        <p className="text-xs font-medium tracking-wide">Searching Global Database...</p>
+                                    </div>
+                                ) : hasResults ? (
+                                    Object.entries(searchResults).map(([category, items]) => (
+                                        <div key={category} className="mb-4 last:mb-0">
+                                            <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-gradient-to-r from-transparent via-transparent to-transparent opacity-70 flex items-center gap-2">
+                                                {category}
+                                                <div className="h-px bg-slate-200 dark:bg-white/10 flex-1"></div>
                                             </div>
-                                        ) : hasResults ? (
-                                            Object.entries(searchResults).map(([category, items]) => (
-                                                <div key={category} className="mb-4 last:mb-0">
-                                                    <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-gradient-to-r from-transparent via-transparent to-transparent opacity-70 flex items-center gap-2">
-                                                        {category}
-                                                        <div className="h-px bg-slate-200 dark:bg-white/10 flex-1"></div>
-                                                    </div>
-                                                    <div className="grid grid-cols-1 gap-1">
-                                                        {items.map(result => {
-                                                            const isSong = result.type === 'song';
-                                                            const linkTo = result.type === 'artist' ? `/artist/${extractIdFromUrl(result.url)}`
-                                                                : result.type === 'album' ? `/album/${extractIdFromUrl(result.url)}`
-                                                                    : result.type === 'playlist' ? `/playlist/${extractIdFromUrl(result.url)}`
-                                                                        : '#';
+                                            <div className="grid grid-cols-1 gap-1">
+                                                {items.map(result => {
+                                                    const isSong = result.type === 'song';
+                                                    const linkTo = result.type === 'artist' ? `/artist/${extractIdFromUrl(result.url)}`
+                                                        : result.type === 'album' ? `/album/${extractIdFromUrl(result.url)}`
+                                                            : result.type === 'playlist' ? `/playlist/${extractIdFromUrl(result.url)}`
+                                                                : '#';
 
-                                                            return (
-                                                                <div
-                                                                    key={result.id}
-                                                                    className="p-2 rounded-xl hover:bg-white/40 dark:hover:bg-white/5 flex items-center gap-3 transition-colors group cursor-pointer relative"
-                                                                    onClick={(e) => {
-                                                                        if (isSong) {
-                                                                            dispatch(setCurrentTrack(result));
-                                                                            dispatch(setQueue([result]));
-                                                                        } else {
-                                                                            navigate(linkTo);
-                                                                        }
-                                                                        addToRecent(result);
-                                                                        setIsSearchOpen(false);
-                                                                        setSearchQuery('');
-                                                                    }}
-                                                                >
-                                                                    <div className="relative w-11 h-11 shrink-0">
-                                                                        <img
-                                                                            src={result.image}
-                                                                            alt={result.title}
-                                                                            onError={(e) => e.target.src = 'https://via.placeholder.com/50'}
-                                                                            className={`w-full h-full object-cover shadow-sm ${result.type === 'artist' ? 'rounded-full' : 'rounded-[10px]'}`}
-                                                                        />
-                                                                        {isSong && (
-                                                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-[10px]">
-                                                                                <span className="material-icons-round text-white text-xl drop-shadow-lg">play_arrow</span>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-
-                                                                    <div className="flex-1 min-w-0 z-10">
-                                                                        <h5 className="text-sm font-semibold text-slate-800 dark:text-gray-100 truncate flex items-center gap-2">
-                                                                            {decodeHtmlEntities(result.title)}
-                                                                        </h5>
-                                                                        <div className="flex items-center gap-2 mt-0.5">
-                                                                            <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded-md">{result.type}</span>
-                                                                            {result.subtitle && <span className="text-xs text-slate-500 dark:text-slate-400 truncate">• {decodeHtmlEntities(result.subtitle)}</span>}
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {isSong && (
-                                                                        <div
-                                                                            className="z-20 opacity-0 group-hover:opacity-100 transition-opacity scale-90 group-hover:scale-100"
-                                                                            onClick={(e) => e.stopPropagation()}
-                                                                        >
-                                                                            <TrackMenu song={result} />
-                                                                        </div>
-                                                                    )}
-
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="flex flex-col items-center justify-center py-12 text-slate-500 opacity-60">
-                                                <span className="material-icons-round text-4xl mb-3">manage_search</span>
-                                                <p className="text-sm">We couldn't find anything for "{searchQuery}"</p>
-                                            </div>
-                                        )}
-                                    </>
-                                ) : (
-                                    <div className="p-4 space-y-6">
-                                        {/* Recent Searches */}
-                                        {recentSearches.length > 0 && (
-                                            <div>
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Recent Searches</h4>
-                                                    <button onClick={clearRecent} className="text-[10px] font-bold text-red-500 hover:text-red-400 uppercase tracking-wider">Clear</button>
-                                                </div>
-                                                <div className="grid grid-cols-1 gap-1">
-                                                    {recentSearches.map(item => (
+                                                    return (
                                                         <div
-                                                            key={item.id}
-                                                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer group"
-                                                            onClick={() => {
-                                                                if (item.type === 'song') {
-                                                                    dispatch(setCurrentTrack(item));
-                                                                    dispatch(setQueue([item]));
+                                                            key={result.id}
+                                                            className="p-2 rounded-xl hover:bg-white/40 dark:hover:bg-white/5 flex items-center gap-3 transition-colors group cursor-pointer relative"
+                                                            onClick={(e) => {
+                                                                if (isSong) {
+                                                                    dispatch(setCurrentTrack(result));
+                                                                    dispatch(setQueue([result]));
                                                                 } else {
-                                                                    const linkTo = item.type === 'artist' ? `/artist/${extractIdFromUrl(item.url)}`
-                                                                        : item.type === 'album' ? `/album/${extractIdFromUrl(item.url)}`
-                                                                            : item.type === 'playlist' ? `/playlist/${extractIdFromUrl(item.url)}`
-                                                                                : '#';
                                                                     navigate(linkTo);
                                                                 }
-                                                                addToRecent(item);
                                                                 setIsSearchOpen(false);
+                                                                setSearchQuery('');
                                                             }}
                                                         >
-                                                            <div className="w-8 h-8 rounded shrink-0 overflow-hidden">
-                                                                <img src={item.image} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100" />
+                                                            <div className="relative w-11 h-11 shrink-0">
+                                                                <img
+                                                                    src={result.image}
+                                                                    alt={result.title}
+                                                                    onError={(e) => e.target.src = 'https://via.placeholder.com/50'}
+                                                                    className={`w-full h-full object-cover shadow-sm ${result.type === 'artist' ? 'rounded-full' : 'rounded-[10px]'}`}
+                                                                />
+                                                                {isSong && (
+                                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-[10px]">
+                                                                        <span className="material-icons-round text-white text-xl drop-shadow-lg">play_arrow</span>
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                            <div className="flex-1 min-w-0">
-                                                                <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate group-hover:text-primary transition-colors">
-                                                                    {decodeHtmlEntities(item.title)}
-                                                                </p>
-                                                                <p className="text-[10px] text-slate-400 truncate">{item.type} • {decodeHtmlEntities(item.subtitle)}</p>
-                                                            </div>
-                                                            <span className="material-icons-round text-slate-300 text-lg opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all">north_west</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
 
-                                        {/* Trending Searches */}
-                                        <div>
-                                            <h4 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Trending Now</h4>
-                                            <div className="flex flex-wrap gap-2">
-                                                {topSearches.length > 0 ? (
-                                                    topSearches.map((item, idx) => (
-                                                        <button
-                                                            key={`top-${idx}`}
-                                                            onClick={() => {
-                                                                setSearchQuery(item.title);
-                                                                searchInputRef.current?.focus();
-                                                            }}
-                                                            className="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/5 border border-transparent hover:border-primary/30 hover:text-primary text-sm font-medium text-slate-600 dark:text-slate-300 transition-all flex items-center gap-1.5 group"
-                                                        >
-                                                            <span className="material-icons-round text-xs text-slate-400 group-hover:text-primary">trending_up</span>
-                                                            {decodeHtmlEntities(item.title)}
-                                                        </button>
-                                                    ))
-                                                ) : (
-                                                    <div className="w-full text-center py-8 text-slate-500 text-xs">Loading trending searches...</div>
-                                                )}
+                                                            <div className="flex-1 min-w-0 z-10">
+                                                                <h5 className="text-sm font-semibold text-slate-800 dark:text-gray-100 truncate flex items-center gap-2">
+                                                                    {decodeHtmlEntities(result.title)}
+                                                                </h5>
+                                                                <div className="flex items-center gap-2 mt-0.5">
+                                                                    <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded-md">{result.type}</span>
+                                                                    {result.subtitle && <span className="text-xs text-slate-500 dark:text-slate-400 truncate">• {decodeHtmlEntities(result.subtitle)}</span>}
+                                                                </div>
+                                                            </div>
+
+                                                            {isSong && (
+                                                                <div
+                                                                    className="z-20 opacity-0 group-hover:opacity-100 transition-opacity scale-90 group-hover:scale-100"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <TrackMenu song={result} />
+                                                                </div>
+                                                            )}
+
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
+                                    ))
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-12 text-slate-500 opacity-60">
+                                        <span className="material-icons-round text-4xl mb-3">manage_search</span>
+                                        <p className="text-sm">We couldn't find anything for "{searchQuery}"</p>
                                     </div>
                                 )}
                             </div>
