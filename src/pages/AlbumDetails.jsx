@@ -401,94 +401,93 @@ export default function AlbumDetails() {
                 </div>
 
                 {/* Right Column - Album Info & Artists */}
-                <div className="space-y-6">
-                    {/* Album Information Card */}
-                    <div className="glass-panel-light dark:glass-panel bg-glass-light dark:bg-[#0f172a]/60 backdrop-blur-xl p-6 rounded-3xl animate-in fade-in slide-in-from-right-4 duration-500 delay-500 border border-white/20 dark:border-white/5">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-lg shadow-primary/20">
-                                <span className="material-icons-round text-white text-xl">info</span>
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-800 dark:text-white">Album Info</h3>
+                <div className="space-y-6 animate-in slide-in-from-right-8 duration-700 delay-300">
+                    {/* Album Information Card - Solid & Clean */}
+                    <div className="bg-white dark:bg-[#0b1526] p-6 rounded-3xl shadow-xl border border-slate-200 dark:border-white/5 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 dark:opacity-10 pointer-events-none">
+                            <span className="material-icons-round text-9xl text-primary transform rotate-12">album</span>
                         </div>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
-                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
-                                    <span className="material-icons-round text-lg opacity-70">calendar_today</span>
-                                    Release Date
-                                </span>
-                                <span className="font-bold text-slate-800 dark:text-white">{albumData.year}</span>
+
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 relative z-10 flex items-center gap-2">
+                            <span className="w-1 h-5 bg-primary rounded-full"></span>
+                            About Album
+                        </h3>
+
+                        <div className="space-y-1 relative z-10">
+                            <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5">
+                                <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">Release Date</span>
+                                <span className="text-slate-900 dark:text-white font-semibold text-sm">{albumData.year}</span>
                             </div>
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
-                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
-                                    <span className="material-icons-round text-lg opacity-70">music_note</span>
-                                    Total Tracks
-                                </span>
-                                <span className="font-bold text-slate-800 dark:text-white">{albumData.list_count}</span>
+                            <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5">
+                                <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">Songs</span>
+                                <span className="text-slate-900 dark:text-white font-semibold text-sm">{albumData.list_count}</span>
                             </div>
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
-                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
-                                    <span className="material-icons-round text-lg opacity-70">schedule</span>
-                                    Duration
-                                </span>
-                                <span className="font-bold text-slate-800 dark:text-white">{getTotalDuration()}</span>
+                            <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5">
+                                <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">Duration</span>
+                                <span className="text-slate-900 dark:text-white font-semibold text-sm">{getTotalDuration()}</span>
                             </div>
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
-                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
-                                    <span className="material-icons-round text-lg opacity-70">language</span>
-                                    Language
-                                </span>
-                                <span className="font-bold text-slate-800 dark:text-white capitalize">{albumData.language}</span>
+                            <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5">
+                                <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">Language</span>
+                                <span className="text-slate-900 dark:text-white font-semibold text-sm capitalize">{albumData.language}</span>
                             </div>
                             {albumData.more_info?.label && (
-                                <div className="p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
-                                    <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 mb-2 font-medium">
-                                        <span className="material-icons-round text-lg opacity-70">label</span>
-                                        Label
-                                    </span>
-                                    <span className="font-bold text-slate-800 dark:text-white text-sm block truncate">{albumData.more_info.label}</span>
+                                <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5">
+                                    <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">Label</span>
+                                    <span className="text-slate-900 dark:text-white font-semibold text-sm text-right truncate max-w-[150px]">{albumData.more_info.label}</span>
+                                </div>
+                            )}
+                            {albumData.more_info?.copyright_text && (
+                                <div className="pt-4 mt-2">
+                                    <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center leading-relaxed font-medium">
+                                        {albumData.more_info.copyright_text}
+                                    </p>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    {/* Artists Card */}
+                    {/* Artists Card - Clean List */}
                     {albumData.more_info?.artistMap?.primary_artists && (
-                        <div className="glass-panel-light dark:glass-panel bg-glass-light dark:bg-[#0f172a]/60 backdrop-blur-xl p-6 rounded-3xl animate-in fade-in slide-in-from-right-4 duration-500 delay-600 border border-white/20 dark:border-white/5">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
-                                    <span className="material-icons-round text-white text-xl">person</span>
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Artists</h3>
-                            </div>
-                            <div className="space-y-3">
+                        <div className="bg-white dark:bg-[#0b1526] p-6 rounded-3xl shadow-xl border border-slate-200 dark:border-white/5">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                                <span className="w-1 h-5 bg-purple-500 rounded-full"></span>
+                                Primary Artists
+                            </h3>
+                            <div className="flex flex-col gap-3">
                                 {albumData.more_info.artistMap.primary_artists.map((artist) => (
                                     <Link
                                         key={artist.id}
                                         to={`/${artist.type}/${extractIdFromUrl(artist.perma_url)}`}
-                                        className="flex items-center gap-3 p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/60 dark:hover:bg-white/10 transition-all group"
+                                        className="flex items-center gap-4 group p-2 -mx-2 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
                                     >
-                                        {artist.image ? (
-                                            <img
-                                                src={getHighQualityImage(artist.image)}
-                                                alt={artist.name}
-                                                className="w-12 h-12 rounded-full object-cover ring-2 ring-white/10 group-hover:ring-primary transition-all"
-                                            />
-                                        ) : (
-                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center">
-                                                <span className="material-icons-round text-white">person</span>
-                                            </div>
-                                        )}
-                                        <div className="flex-1 min-w-0">
-                                            <span className="font-bold text-slate-800 dark:text-white group-hover:text-primary transition-colors block truncate">
-                                                {artist.name}
-                                            </span>
-                                            <span className="text-xs text-slate-500 dark:text-slate-400 capitalize bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full mt-1 inline-block">{artist.role || 'Artist'}</span>
+                                        <div className="relative w-12 h-12 shrink-0">
+                                            {artist.image ? (
+                                                <img
+                                                    src={getHighQualityImage(artist.image)}
+                                                    alt={artist.name}
+                                                    className="w-full h-full rounded-full object-cover shadow-sm group-hover:scale-105 transition-transform ring-2 ring-slate-100 dark:ring-white/10"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-white font-bold ring-2 ring-white/10">
+                                                    {artist.name[0]}
+                                                </div>
+                                            )}
                                         </div>
-                                        <span className="material-icons-round text-slate-400 group-hover:text-primary transition-colors">chevron_right</span>
+
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-bold text-slate-900 dark:text-white text-sm group-hover:text-primary transition-colors truncate">
+                                                {artist.name}
+                                            </h4>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 capitalize bg-slate-100 dark:bg-white/5 w-fit px-2 py-0.5 rounded-full mt-1">
+                                                {artist.role || 'Artist'}
+                                            </p>
+                                        </div>
+                                        <span className="material-icons-round text-slate-300 group-hover:text-primary transition-colors text-lg">chevron_right</span>
                                     </Link>
                                 ))}
                             </div>
                         </div>
+                    )}
                     )}
 
                     {/* Copyright */}
@@ -503,56 +502,58 @@ export default function AlbumDetails() {
             </div>
 
             {/* Modules Section - Related Content */}
-            {modulesData && modulesData.length > 0 && (
-                <div className="space-y-12 mt-16">
-                    {modulesData.map((module, moduleIndex) => (
-                        <div key={module.key} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${800 + moduleIndex * 100}ms` }}>
-                            {/* Module Header */}
-                            <div className="flex items-center justify-between mb-6 px-2">
-                                <h2 className="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
-                                    <span className="w-1 h-8 bg-gradient-to-b from-pink-500 to-orange-500 rounded-full"></span>
-                                    {module.title}
-                                </h2>
-                            </div>
+            {
+                modulesData && modulesData.length > 0 && (
+                    <div className="space-y-12 mt-16">
+                        {modulesData.map((module, moduleIndex) => (
+                            <div key={module.key} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${800 + moduleIndex * 100}ms` }}>
+                                {/* Module Header */}
+                                <div className="flex items-center justify-between mb-6 px-2">
+                                    <h2 className="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-3">
+                                        <span className="w-1 h-8 bg-gradient-to-b from-pink-500 to-orange-500 rounded-full"></span>
+                                        {module.title}
+                                    </h2>
+                                </div>
 
-                            {/* Module Content - Horizontal Scroll */}
-                            <div className="flex gap-6 overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory -mx-2 px-6">
-                                {module.data.map((item, itemIndex) => (
-                                    <Link
-                                        key={item.id || itemIndex}
-                                        to={`/${item.type}/${extractIdFromUrl(item.perma_url) || item.id}`}
-                                        className="snap-center shrink-0 w-48 group cursor-pointer flex flex-col gap-4 relative"
-                                    >
-                                        <div className="aspect-square rounded-3xl overflow-hidden relative shadow-lg group-hover:shadow-[0_20px_40px_-15px_rgba(var(--primary-rgb),0.3)] transition-all duration-500">
-                                            <img
-                                                src={getHighQualityImage(item.image)}
-                                                alt={item.title}
-                                                loading="lazy"
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                                            />
-                                            {/* Glass Overlay on Hover */}
-                                            <div className="absolute inset-0 bg-white/10 dark:bg-black/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-                                                <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 text-white shadow-xl scale-50 group-hover:scale-100 transition-all duration-500 hover:bg-primary hover:border-primary">
-                                                    <span className="material-icons-round text-3xl ml-1">play_arrow</span>
+                                {/* Module Content - Horizontal Scroll */}
+                                <div className="flex gap-6 overflow-x-auto pb-6 hide-scrollbar snap-x snap-mandatory -mx-2 px-6">
+                                    {module.data.map((item, itemIndex) => (
+                                        <Link
+                                            key={item.id || itemIndex}
+                                            to={`/${item.type}/${extractIdFromUrl(item.perma_url) || item.id}`}
+                                            className="snap-center shrink-0 w-48 group cursor-pointer flex flex-col gap-4 relative"
+                                        >
+                                            <div className="aspect-square rounded-3xl overflow-hidden relative shadow-lg group-hover:shadow-[0_20px_40px_-15px_rgba(var(--primary-rgb),0.3)] transition-all duration-500">
+                                                <img
+                                                    src={getHighQualityImage(item.image)}
+                                                    alt={item.title}
+                                                    loading="lazy"
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                                                />
+                                                {/* Glass Overlay on Hover */}
+                                                <div className="absolute inset-0 bg-white/10 dark:bg-black/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                                                    <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 text-white shadow-xl scale-50 group-hover:scale-100 transition-all duration-500 hover:bg-primary hover:border-primary">
+                                                        <span className="material-icons-round text-3xl ml-1">play_arrow</span>
+                                                    </div>
                                                 </div>
+
+                                                <span className="absolute top-3 left-3 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold text-white border border-white/10 uppercase tracking-wider">
+                                                    {item.type || 'Album'}
+                                                </span>
                                             </div>
 
-                                            <span className="absolute top-3 left-3 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold text-white border border-white/10 uppercase tracking-wider">
-                                                {item.type || 'Album'}
-                                            </span>
-                                        </div>
-
-                                        <div className="px-1 relative group-hover:-translate-y-1 transition-transform duration-300">
-                                            <h4 className="font-bold text-slate-800 dark:text-slate-100 truncate text-base group-hover:text-primary transition-colors">{item.title}</h4>
-                                            <p className="text-xs text-slate-500 font-medium truncate mt-1">{item.subtitle || item.description}</p>
-                                        </div>
-                                    </Link>
-                                ))}
+                                            <div className="px-1 relative group-hover:-translate-y-1 transition-transform duration-300">
+                                                <h4 className="font-bold text-slate-800 dark:text-slate-100 truncate text-base group-hover:text-primary transition-colors">{item.title}</h4>
+                                                <p className="text-xs text-slate-500 font-medium truncate mt-1">{item.subtitle || item.description}</p>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
+                        ))}
+                    </div>
+                )
+            }
+        </div >
     );
 }

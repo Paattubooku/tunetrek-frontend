@@ -379,39 +379,35 @@ export default function PlaylistDetails() {
                 </div>
 
                 {/* Right Column - Playlist Info & Artists */}
-                <div className="space-y-6">
-                    {/* Info Card */}
-                    <div className="glass-panel-light dark:glass-panel bg-glass-light dark:bg-[#0f172a]/60 backdrop-blur-xl p-6 rounded-3xl animate-in fade-in slide-in-from-right-4 duration-500 delay-500 border border-white/20 dark:border-white/5">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center shadow-lg shadow-primary/20">
-                                <span className="material-icons-round text-white text-xl">info</span>
-                            </div>
-                            <h3 className="text-xl font-bold text-slate-800 dark:text-white">Info</h3>
+                <div className="space-y-6 animate-in slide-in-from-right-8 duration-700 delay-300">
+                    {/* Info Card - Solid & Clean */}
+                    <div className="bg-white dark:bg-[#0b1526] p-6 rounded-3xl shadow-xl border border-slate-200 dark:border-white/5 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 dark:opacity-10 pointer-events-none">
+                            <span className="material-icons-round text-9xl text-primary transform rotate-12">queue_music</span>
                         </div>
-                        <div className="space-y-4">
+
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 relative z-10 flex items-center gap-2">
+                            <span className="w-1 h-5 bg-primary rounded-full"></span>
+                            About Playlist
+                        </h3>
+
+                        <div className="space-y-1 relative z-10">
                             {playlistData.more_info?.uid && (
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
-                                    <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
-                                        <span className="material-icons-round text-lg opacity-70">person</span>
-                                        Curator
+                                <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5">
+                                    <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">Curator</span>
+                                    <span className="text-slate-900 dark:text-white font-semibold text-sm block truncate max-w-[120px]">
+                                        {playlistData.more_info.firstname} {playlistData.more_info.lastname}
                                     </span>
-                                    <span className="font-bold text-slate-800 dark:text-white block truncate max-w-[120px]">{playlistData.more_info.firstname} {playlistData.more_info.lastname}</span>
                                 </div>
                             )}
-                            <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
-                                <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
-                                    <span className="material-icons-round text-lg opacity-70">favorite</span>
-                                    Followers
-                                </span>
-                                <span className="font-bold text-slate-800 dark:text-white">{playlistData.more_info?.follower_count || '0'}</span>
+                            <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5">
+                                <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">Followers</span>
+                                <span className="text-slate-900 dark:text-white font-semibold text-sm">{playlistData.more_info?.follower_count || '0'}</span>
                             </div>
                             {playlistData.more_info?.last_updated && (
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-white/5 border border-transparent dark:border-white/5 hover:bg-white/50 dark:hover:bg-white/10 transition-colors">
-                                    <span className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-2 font-medium">
-                                        <span className="material-icons-round text-lg opacity-70">update</span>
-                                        Updated
-                                    </span>
-                                    <span className="font-bold text-slate-800 dark:text-white text-sm">
+                                <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-white/5">
+                                    <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">Updated</span>
+                                    <span className="text-slate-900 dark:text-white font-semibold text-sm">
                                         {new Date(parseInt(playlistData.more_info.last_updated) * 1000).toLocaleDateString()}
                                     </span>
                                 </div>
