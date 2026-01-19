@@ -14,7 +14,6 @@ export default function Home() {
     const { user } = useSelector(state => state.auth);
     const [homeData, setHomeData] = useState(null);
     const [recentTracks, setRecentTracks] = useState([]);
-    const [userLocation, setUserLocation] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -26,9 +25,9 @@ export default function Home() {
                 const response = await fetch(`${API_URL}/?language=${langParam}`);
                 const data = await response.json();
 
+
                 // Extract location metadata
-                if (data._metadata?.userLocation) {
-                    setUserLocation(data._metadata.userLocation);
+                if (data._metadata) {
                     delete data._metadata; // Remove metadata from homeData
                 }
 
@@ -390,19 +389,9 @@ export default function Home() {
                 <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-400 dark:from-white dark:to-slate-500 tracking-tighter drop-shadow-sm animate-in slide-in-from-left-4 duration-1000">
                     {getGreeting()}
                 </h1>
-                <div className="flex items-center gap-3 mt-2">
-                    <p className="text-slate-500 dark:text-slate-400 text-lg font-medium animate-in slide-in-from-left-4 duration-1000 delay-100">
-                        Ready to discover your next obsession?
-                    </p>
-                    {userLocation && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/40 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-md animate-in slide-in-from-right-4 duration-1000 delay-200">
-                            <span className="material-icons-round text-primary text-sm">location_on</span>
-                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                {userLocation.city}, {userLocation.state}
-                            </span>
-                        </div>
-                    )}
-                </div>
+                <p className="text-slate-500 dark:text-slate-400 text-lg font-medium mt-1 animate-in slide-in-from-left-4 duration-1000 delay-100">
+                    Ready to discover your next obsession?
+                </p>
             </div>
 
             {/* Massive Hero Card */}
