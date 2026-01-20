@@ -101,18 +101,17 @@ export default function Home() {
         // Visual Stagger Delay
         const delayClass = `delay-[${index * 100}ms]`;
 
-        // Create unique ref for this section's scroll container
-        const scrollContainerRef = React.useRef(null);
-
-        const scrollLeft = () => {
-            if (scrollContainerRef.current) {
-                scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+        const scrollLeft = (e) => {
+            const container = e.currentTarget.parentElement.querySelector('[data-scroll-container]');
+            if (container) {
+                container.scrollBy({ left: -300, behavior: 'smooth' });
             }
         };
 
-        const scrollRight = () => {
-            if (scrollContainerRef.current) {
-                scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+        const scrollRight = (e) => {
+            const container = e.currentTarget.parentElement.querySelector('[data-scroll-container]');
+            if (container) {
+                container.scrollBy({ left: 300, behavior: 'smooth' });
             }
         };
 
@@ -155,16 +154,16 @@ export default function Home() {
                         </button>
 
                         <div
-                            ref={scrollContainerRef}
+                            data-scroll-container
                             className="flex gap-6 overflow-x-auto hide-scrollbar snap-x snap-mandatory -mx-2 px-6"
                             tabIndex={0}
                             onKeyDown={(e) => {
                                 if (e.key === 'ArrowLeft') {
                                     e.preventDefault();
-                                    scrollLeft();
+                                    e.currentTarget.scrollBy({ left: -300, behavior: 'smooth' });
                                 } else if (e.key === 'ArrowRight') {
                                     e.preventDefault();
-                                    scrollRight();
+                                    e.currentTarget.scrollBy({ left: 300, behavior: 'smooth' });
                                 }
                             }}
                         >
@@ -256,16 +255,16 @@ export default function Home() {
                         </button>
 
                         <div
-                            ref={scrollContainerRef}
+                            data-scroll-container
                             className="flex gap-3 md:gap-4 overflow-x-auto pb-4 md:pb-6 hide-scrollbar snap-x snap-mandatory -mx-1 md:-mx-2 px-3 md:px-6"
                             tabIndex={0}
                             onKeyDown={(e) => {
                                 if (e.key === 'ArrowLeft') {
                                     e.preventDefault();
-                                    scrollLeft();
+                                    e.currentTarget.scrollBy({ left: -300, behavior: 'smooth' });
                                 } else if (e.key === 'ArrowRight') {
                                     e.preventDefault();
-                                    scrollRight();
+                                    e.currentTarget.scrollBy({ left: 300, behavior: 'smooth' });
                                 }
                             }}
                         >
