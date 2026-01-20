@@ -63,14 +63,24 @@ export default function TrackMenu({ song, className = "" }) {
         } else {
             // Calculate position
             const rect = buttonRef.current.getBoundingClientRect();
-            // Default: align top-right of menu with bottom-right of button
-            // If near bottom of screen, align bottom-right of menu with top-right of button
+
+            // Safe zone at bottom (player + padding)
+            // Desktop player ~96px, Mobile nav+player ~120px. 
+            // We use a safe margin to ensure menu doesn't overlap player or get cut off.
+            const bottomSafeZone = 140;
+
+            // Approximate height of the full menu
+            const menuHeight = 400;
+
+            // Check available space below
             const spaceBelow = window.innerHeight - rect.bottom;
-            const openUpwards = spaceBelow < 200; // if less than 200px space below
+
+            // Open upwards if not enough space below (considering safe zone)
+            const openUpwards = (spaceBelow - bottomSafeZone) < menuHeight;
 
             setPosition({
                 top: openUpwards ? (rect.top - 8) : (rect.bottom + 8),
-                left: rect.right, // Align right edge (css will simpler use right: auto, left: rect.right - width. wait. let's pass right/top coords)
+                left: rect.right,
                 alignRight: true,
                 openUpwards
             });
@@ -355,11 +365,14 @@ export default function TrackMenu({ song, className = "" }) {
 
             {isOpen && createPortal(
                 <div
-                    className="fixed z-[9999] w-52 bg-white/90 dark:bg-slate-900/95 backdrop-blur-3xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+                    className="fixed z-[9999] w-52 bg-white/90 dark:bg-slate-900/95 backdrop-blur-3xl border border-white/20 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col"
                     style={{
                         top: position.openUpwards ? 'auto' : position.top,
                         bottom: position.openUpwards ? (window.innerHeight - position.top) : 'auto',
                         left: position.left - 208, // 208px = w-52 (13rem = 208px)
+                        maxHeight: '60vh', // Limit height to ensure viewport visibility
+                        overflowY: 'auto', // Enable scrolling if needed,
+                        scrollbarWidth: 'none' // Hide scrollbar for cleaner look
                     }}
                     onClick={(e) => e.stopPropagation()}
                     onMouseDown={(e) => e.stopPropagation()}
