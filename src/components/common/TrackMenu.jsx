@@ -70,7 +70,7 @@ export default function TrackMenu({ song, className = "" }) {
             const MENU_WIDTH = 208; // 13rem (w-52)
             const GAP = 8;
             const PADDING = 16;
-            const PLAYER_HEIGHT = 100; // Footer player height
+            const PLAYER_HEIGHT = 130; // Footer player height (safe for mobile nav + player)
 
             // Determine Vertical Position
             // Available space below (minus player)
@@ -405,8 +405,7 @@ export default function TrackMenu({ song, className = "" }) {
                         bottom: position.bottom,
                         left: position.left,
                         maxHeight: position.maxHeight,
-                        overflowY: 'auto',
-                        scrollbarWidth: 'none'
+                        overflowY: 'auto'
                     }}
                     onClick={(e) => e.stopPropagation()}
                     onMouseDown={(e) => e.stopPropagation()}
