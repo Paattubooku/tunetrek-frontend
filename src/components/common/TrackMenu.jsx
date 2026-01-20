@@ -63,26 +63,60 @@ export default function TrackMenu({ song, className = "" }) {
         } else {
             // Calculate position
             const rect = buttonRef.current.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const windowWidth = window.innerWidth;
 
-            // Safe zone at bottom (player + padding)
-            // Desktop player ~96px, Mobile nav+player ~120px. 
-            // We use a safe margin to ensure menu doesn't overlap player or get cut off.
-            const bottomSafeZone = 140;
+            // Dimensions
+            const MENU_WIDTH = 208; // 13rem (w-52)
+            const GAP = 8;
+            const PADDING = 16;
+            const PLAYER_HEIGHT = 100; // Footer player height
 
-            // Approximate height of the full menu
-            const menuHeight = 400;
+            // Determine Vertical Position
+            // Available space below (minus player)
+            const spaceBelow = windowHeight - rect.bottom - PLAYER_HEIGHT;
+            // Available space above
+            const spaceAbove = rect.top;
 
-            // Check available space below
-            const spaceBelow = window.innerHeight - rect.bottom;
+            let openUpwards = false;
+            let maxHeight = 0;
 
-            // Open upwards if not enough space below (considering safe zone)
-            const openUpwards = (spaceBelow - bottomSafeZone) < menuHeight;
+            // Logic: Prefer opening down if there's enough space (e.g. 300px)
+            // If not, check if there is more space above.
+            if (spaceBelow >= 300) {
+                openUpwards = false;
+                maxHeight = spaceBelow - PADDING;
+            } else if (spaceAbove > spaceBelow) {
+                // If constrained below, and more space above, go up.
+                openUpwards = true;
+                maxHeight = spaceAbove - PADDING;
+            } else {
+                // If both are tight, go to the larger one
+                openUpwards = false;
+                maxHeight = spaceBelow - PADDING;
+            }
+
+            // Determine Horizontal Position
+            // Default: Align Right Edge of menu with Right Edge of button
+            let left = rect.right - MENU_WIDTH;
+
+            // If this pushes it off the left edge of the screen
+            if (left < PADDING) {
+                // Align Left Edge of menu with Left Edge of button instead
+                left = rect.left;
+            }
+
+            // Failsafe: If it pushes off the right edge (unlikely with default, but good for safety)
+            if (left + MENU_WIDTH > windowWidth - PADDING) {
+                left = windowWidth - MENU_WIDTH - PADDING;
+            }
 
             setPosition({
-                top: openUpwards ? (rect.top - 8) : (rect.bottom + 8),
-                left: rect.right,
-                alignRight: true,
-                openUpwards
+                top: openUpwards ? 'auto' : (rect.bottom + GAP),
+                bottom: openUpwards ? (windowHeight - rect.top + GAP) : 'auto',
+                left: left,
+                maxHeight: Math.max(maxHeight, 150), // Ensure at least 150px or it's unusable
+                openUpwards // Used for animation origin if needed
             });
             setIsOpen(true);
         }
@@ -365,14 +399,14 @@ export default function TrackMenu({ song, className = "" }) {
 
             {isOpen && createPortal(
                 <div
-                    className="fixed z-[9999] w-52 bg-white/90 dark:bg-slate-900/95 backdrop-blur-3xl border border-white/20 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col"
+                    className={`fixed z-[9999] w-52 bg-white/90 dark:bg-slate-900/95 backdrop-blur-3xl border border-white/20 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col ${position.openUpwards ? 'origin-bottom-right' : 'origin-top-right'}`}
                     style={{
-                        top: position.openUpwards ? 'auto' : position.top,
-                        bottom: position.openUpwards ? (window.innerHeight - position.top) : 'auto',
-                        left: position.left - 208, // 208px = w-52 (13rem = 208px)
-                        maxHeight: '60vh', // Limit height to ensure viewport visibility
-                        overflowY: 'auto', // Enable scrolling if needed,
-                        scrollbarWidth: 'none' // Hide scrollbar for cleaner look
+                        top: position.top,
+                        bottom: position.bottom,
+                        left: position.left,
+                        maxHeight: position.maxHeight,
+                        overflowY: 'auto',
+                        scrollbarWidth: 'none'
                     }}
                     onClick={(e) => e.stopPropagation()}
                     onMouseDown={(e) => e.stopPropagation()}
