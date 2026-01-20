@@ -192,55 +192,7 @@ export default function QueueDrawer() {
                         </div>
                     </div>
 
-                    <div
-                        className="flex-1 overflow-y-auto px-6 pb-32 hide-scrollbar"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                            if (upNext.length === 0) return;
-
-                            const currentFocusIndex = parseInt(e.currentTarget.dataset.focusedIndex || '-1');
-                            let newIndex = currentFocusIndex;
-
-                            if (e.key === 'ArrowDown') {
-                                e.preventDefault();
-                                newIndex = currentFocusIndex < upNext.length - 1 ? currentFocusIndex + 1 : 0;
-                            } else if (e.key === 'ArrowUp') {
-                                e.preventDefault();
-                                newIndex = currentFocusIndex > 0 ? currentFocusIndex - 1 : upNext.length - 1;
-                            } else if (e.key === 'Enter' && currentFocusIndex >= 0) {
-                                e.preventDefault();
-                                dispatch(setCurrentTrack(upNext[currentFocusIndex]));
-                            } else if (e.key === 'Delete' && currentFocusIndex >= 0) {
-                                e.preventDefault();
-                                const realIndex = currentIndex + 1 + currentFocusIndex;
-                                dispatch(removeFromQueue(realIndex));
-                            }
-
-                            // Update focus index
-                            e.currentTarget.dataset.focusedIndex = newIndex;
-
-                            // Scroll to focused item
-                            const items = e.currentTarget.querySelectorAll('[data-queue-index]');
-                            if (items[newIndex]) {
-                                items[newIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                                // Add visual highlight
-                                items.forEach((item, idx) => {
-                                    if (idx === newIndex) {
-                                        item.classList.add('ring-2', 'ring-primary', 'bg-primary/5');
-                                    } else {
-                                        item.classList.remove('ring-2', 'ring-primary', 'bg-primary/5');
-                                    }
-                                });
-                            }
-                        }}
-                        onBlur={(e) => {
-                            // Remove highlights when focus is lost
-                            const items = e.currentTarget.querySelectorAll('[data-queue-index]');
-                            items.forEach(item => {
-                                item.classList.remove('ring-2', 'ring-primary', 'bg-primary/5');
-                            });
-                        }}
-                    >
+                    <div className="flex-1 overflow-y-auto px-6 pb-32 hide-scrollbar">
                         {/* Empty State */}
                         {queue.length === 0 && (
                             <div className="flex flex-col items-center justify-center h-full text-slate-400 gap-6 animate-in zoom-in-95 duration-500">
