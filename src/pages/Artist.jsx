@@ -35,7 +35,7 @@ export default function Artist() {
         const fetchArtistDetails = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`${API_URL}/artist/${id}`);
+                const response = await fetch(`https://mserver-pi.vercel.app/artist/${id}`);
                 const data = await response.json();
                 setArtistData(data);
                 setAllSongs(data.topSongs || []);
@@ -62,7 +62,7 @@ export default function Artist() {
         setLoadingSongs(true);
         try {
             const nextPage = songsPage + 1;
-            const response = await fetch(`${API_URL}/artist/${id}?p=${nextPage}&sub_type=songs&more=true`);
+            const response = await fetch(`https://mserver-pi.vercel.app/artist/${id}?p=${nextPage}&sub_type=songs&more=true`);
             const data = await response.json();
 
             if (data.topSongs && data.topSongs.length > 0) {
@@ -85,7 +85,7 @@ export default function Artist() {
         setLoadingAlbums(true);
         try {
             const nextPage = albumsPage + 1;
-            const response = await fetch(`${API_URL}/artist/${id}?p=${nextPage}&sub_type=albums&more=true`);
+            const response = await fetch(`https://mserver-pi.vercel.app/artist/${id}?p=${nextPage}&sub_type=albums&more=true`);
             const data = await response.json();
 
             if (data.topAlbums && data.topAlbums.length > 0) {
