@@ -30,7 +30,7 @@ export default function TrackMenu({ song, className = "" }) {
         checkFavorite();
     }, [user, song]);
 
-    // Handle closing when clicking outside or scrolling
+    // Handle closing when clicking outside
     useEffect(() => {
         if (!isOpen) return;
 
@@ -44,15 +44,9 @@ export default function TrackMenu({ song, className = "" }) {
 
         // Close on global click
         document.addEventListener("mousedown", handleClose);
-        // Close on scroll (simplest way to handle fixed positioning drifting)
-        window.addEventListener("scroll", handleClose, true);
-        // Close on resize
-        window.addEventListener("resize", handleClose);
 
         return () => {
             document.removeEventListener("mousedown", handleClose);
-            window.removeEventListener("scroll", handleClose, true);
-            window.removeEventListener("resize", handleClose);
         };
     }, [isOpen]);
 
