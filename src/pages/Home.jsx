@@ -101,6 +101,21 @@ export default function Home() {
         // Visual Stagger Delay
         const delayClass = `delay-[${index * 100}ms]`;
 
+        // Create unique ref for this section's scroll container
+        const scrollContainerRef = React.useRef(null);
+
+        const scrollLeft = () => {
+            if (scrollContainerRef.current) {
+                scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+            }
+        };
+
+        const scrollRight = () => {
+            if (scrollContainerRef.current) {
+                scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+            }
+        };
+
         // VARIANT 1: HORIZONTAL SCROLL (New Releases, Radio, Recently Played)
         if (title.toLowerCase().includes('new') || title.toLowerCase().includes('radio') || title.toLowerCase().includes('recently')) {
             return (
@@ -120,42 +135,75 @@ export default function Home() {
                         </Link>
                     </div>
 
-                    <div className="flex gap-6 overflow-x-auto hide-scrollbar snap-x snap-mandatory -mx-2 px-6">
-                        {items.map((item, i) => (
-                            <Link
-                                to={getItemLink(item)}
-                                key={item.id}
-                                onClick={(e) => handleCardClick(e, item)}
-                                className="snap-center shrink-0 w-48 group cursor-pointer flex flex-col gap-4 relative"
-                                style={{ animationDelay: `${i * 50}ms` }}
-                            >
-                                <div className="aspect-square rounded-3xl overflow-hidden relative shadow-lg group-hover:shadow-[0_20px_40px_-15px_rgba(var(--primary-rgb),0.3)] transition-all duration-500 z-10">
-                                    <img
-                                        src={getHighQualityImage(item.image)}
-                                        alt={item.title}
-                                        loading="lazy"
-                                        className={`w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-transform duration-700 ease-out ${item.type === 'artist' ? 'rounded-full' : ''}`}
-                                    />
-                                    {/* Glass Overlay on Hover */}
-                                    <div className="absolute inset-0 bg-white/10 dark:bg-black/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-                                        <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 text-white shadow-xl scale-50 group-hover:scale-100 transition-all duration-500 hover:bg-primary hover:border-primary">
-                                            <span className="material-icons-round text-3xl ml-1">
-                                                {item.type === 'artist' ? 'person' : 'play_arrow'}
-                                            </span>
+                    <div className="relative group/scroll">
+                        {/* Left Scroll Button */}
+                        <button
+                            onClick={scrollLeft}
+                            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-30 w-12 h-12 items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-full shadow-xl border border-white/20 text-slate-800 dark:text-white opacity-0 group-hover/scroll:opacity-100 hover:scale-110 active:scale-95 transition-all"
+                            aria-label="Scroll left"
+                        >
+                            <span className="material-icons-round">chevron_left</span>
+                        </button>
+
+                        {/* Right Scroll Button */}
+                        <button
+                            onClick={scrollRight}
+                            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-30 w-12 h-12 items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-full shadow-xl border border-white/20 text-slate-800 dark:text-white opacity-0 group-hover/scroll:opacity-100 hover:scale-110 active:scale-95 transition-all"
+                            aria-label="Scroll right"
+                        >
+                            <span className="material-icons-round">chevron_right</span>
+                        </button>
+
+                        <div
+                            ref={scrollContainerRef}
+                            className="flex gap-6 overflow-x-auto hide-scrollbar snap-x snap-mandatory -mx-2 px-6"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'ArrowLeft') {
+                                    e.preventDefault();
+                                    scrollLeft();
+                                } else if (e.key === 'ArrowRight') {
+                                    e.preventDefault();
+                                    scrollRight();
+                                }
+                            }}
+                        >
+                            {items.map((item, i) => (
+                                <Link
+                                    to={getItemLink(item)}
+                                    key={item.id}
+                                    onClick={(e) => handleCardClick(e, item)}
+                                    className="snap-center shrink-0 w-48 group cursor-pointer flex flex-col gap-4 relative"
+                                    style={{ animationDelay: `${i * 50}ms` }}
+                                >
+                                    <div className="aspect-square rounded-3xl overflow-hidden relative shadow-lg group-hover:shadow-[0_20px_40px_-15px_rgba(var(--primary-rgb),0.3)] transition-all duration-500 z-10">
+                                        <img
+                                            src={getHighQualityImage(item.image)}
+                                            alt={item.title}
+                                            loading="lazy"
+                                            className={`w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-transform duration-700 ease-out ${item.type === 'artist' ? 'rounded-full' : ''}`}
+                                        />
+                                        {/* Glass Overlay on Hover */}
+                                        <div className="absolute inset-0 bg-white/10 dark:bg-black/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                                            <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 text-white shadow-xl scale-50 group-hover:scale-100 transition-all duration-500 hover:bg-primary hover:border-primary">
+                                                <span className="material-icons-round text-3xl ml-1">
+                                                    {item.type === 'artist' ? 'person' : 'play_arrow'}
+                                                </span>
+                                            </div>
                                         </div>
+
+                                        <span className="absolute top-3 left-3 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold text-white border border-white/10 uppercase tracking-wider">
+                                            {item.type || 'Album'}
+                                        </span>
                                     </div>
 
-                                    <span className="absolute top-3 left-3 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-bold text-white border border-white/10 uppercase tracking-wider">
-                                        {item.type || 'Album'}
-                                    </span>
-                                </div>
-
-                                <div className="px-1 relative z-20 group-hover:-translate-y-1 transition-transform duration-300">
-                                    <h4 className="font-bold text-slate-800 dark:text-slate-100 truncate text-base group-hover:text-primary transition-colors">{item.title}</h4>
-                                    <p className="text-xs text-slate-500 font-medium truncate mt-1">{item.subtitle || item.description}</p>
-                                </div>
-                            </Link>
-                        ))}
+                                    <div className="px-1 relative z-20 group-hover:-translate-y-1 transition-transform duration-300">
+                                        <h4 className="font-bold text-slate-800 dark:text-slate-100 truncate text-base group-hover:text-primary transition-colors">{item.title}</h4>
+                                        <p className="text-xs text-slate-500 font-medium truncate mt-1">{item.subtitle || item.description}</p>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                 </section>
             );
@@ -188,80 +236,113 @@ export default function Home() {
                         </Link>
                     </div>
 
-                    <div className="flex gap-3 md:gap-4 overflow-x-auto pb-4 md:pb-6 hide-scrollbar snap-x snap-mandatory -mx-1 md:-mx-2 px-3 md:px-6">
-                        {items.slice(0, 10).map((item, idx) => (
-                            <Link
-                                to={getItemLink(item)}
-                                key={item.id}
-                                onClick={(e) => handleCardClick(e, item)}
-                                className="snap-center shrink-0 w-40 sm:w-48 md:w-56 group cursor-pointer relative"
-                                style={{ animationDelay: `${idx * 50}ms` }}
-                            >
-                                <div className="relative h-52 sm:h-64 md:h-72 rounded-xl md:rounded-2xl overflow-hidden shadow-md md:shadow-lg group-hover:shadow-xl group-hover:shadow-primary/20 transition-all duration-500">
-                                    {/* Background Image */}
-                                    <img
-                                        src={getHighQualityImage(item.image)}
-                                        alt={item.title}
-                                        loading="lazy"
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
-                                    />
+                    <div className="relative group/scroll">
+                        {/* Left Scroll Button */}
+                        <button
+                            onClick={scrollLeft}
+                            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-30 w-12 h-12 items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-full shadow-xl border border-white/20 text-slate-800 dark:text-white opacity-0 group-hover/scroll:opacity-100 hover:scale-110 active:scale-95 transition-all"
+                            aria-label="Scroll left"
+                        >
+                            <span className="material-icons-round">chevron_left</span>
+                        </button>
 
-                                    {/* Gradient Overlays */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90"></div>
-                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-purple-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                        {/* Right Scroll Button */}
+                        <button
+                            onClick={scrollRight}
+                            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-30 w-12 h-12 items-center justify-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-full shadow-xl border border-white/20 text-slate-800 dark:text-white opacity-0 group-hover/scroll:opacity-100 hover:scale-110 active:scale-95 transition-all"
+                            aria-label="Scroll right"
+                        >
+                            <span className="material-icons-round">chevron_right</span>
+                        </button>
 
-                                    {/* Ranking Badge */}
-                                    <div className="absolute top-2 md:top-3 left-2 md:left-3 z-20">
-                                        <div className={`relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg md:rounded-xl font-black text-lg sm:text-xl md:text-2xl italic ${idx === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-lg md:shadow-xl shadow-yellow-500/40' :
-                                            idx === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-500 text-white shadow-lg md:shadow-xl shadow-slate-400/40' :
-                                                idx === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg md:shadow-xl shadow-orange-500/40' :
-                                                    'bg-white/20 backdrop-blur-md text-white border border-white/30'
-                                            }`}>
-                                            {idx + 1}
-                                            {idx < 3 && (
-                                                <span className="absolute -top-0.5 md:-top-1 -right-0.5 md:-right-1 material-icons-round text-xs md:text-sm animate-bounce">
-                                                    star
-                                                </span>
-                                            )}
+                        <div
+                            ref={scrollContainerRef}
+                            className="flex gap-3 md:gap-4 overflow-x-auto pb-4 md:pb-6 hide-scrollbar snap-x snap-mandatory -mx-1 md:-mx-2 px-3 md:px-6"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'ArrowLeft') {
+                                    e.preventDefault();
+                                    scrollLeft();
+                                } else if (e.key === 'ArrowRight') {
+                                    e.preventDefault();
+                                    scrollRight();
+                                }
+                            }}
+                        >
+                            {items.slice(0, 10).map((item, idx) => (
+                                <Link
+                                    to={getItemLink(item)}
+                                    key={item.id}
+                                    onClick={(e) => handleCardClick(e, item)}
+                                    className="snap-center shrink-0 w-40 sm:w-48 md:w-56 group cursor-pointer relative"
+                                    style={{ animationDelay: `${idx * 50}ms` }}
+                                >
+                                    <div className="relative h-52 sm:h-64 md:h-72 rounded-xl md:rounded-2xl overflow-hidden shadow-md md:shadow-lg group-hover:shadow-xl group-hover:shadow-primary/20 transition-all duration-500">
+                                        {/* Background Image */}
+                                        <img
+                                            src={getHighQualityImage(item.image)}
+                                            alt={item.title}
+                                            loading="lazy"
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
+                                        />
+
+                                        {/* Gradient Overlays */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-90"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-purple-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+                                        {/* Ranking Badge */}
+                                        <div className="absolute top-2 md:top-3 left-2 md:left-3 z-20">
+                                            <div className={`relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg md:rounded-xl font-black text-lg sm:text-xl md:text-2xl italic ${idx === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-white shadow-lg md:shadow-xl shadow-yellow-500/40' :
+                                                idx === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-500 text-white shadow-lg md:shadow-xl shadow-slate-400/40' :
+                                                    idx === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white shadow-lg md:shadow-xl shadow-orange-500/40' :
+                                                        'bg-white/20 backdrop-blur-md text-white border border-white/30'
+                                                }`}>
+                                                {idx + 1}
+                                                {idx < 3 && (
+                                                    <span className="absolute -top-0.5 md:-top-1 -right-0.5 md:-right-1 material-icons-round text-xs md:text-sm animate-bounce">
+                                                        star
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Play Button Overlay */}
-                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 z-10">
-                                        <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center border-2 border-white/40 text-white shadow-lg md:shadow-xl scale-50 group-hover:scale-100 transition-all duration-500 hover:bg-primary hover:border-primary">
-                                            <span className="material-icons-round text-xl sm:text-2xl md:text-3xl ml-0.5">play_arrow</span>
+                                        {/* Play Button Overlay */}
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 z-10">
+                                            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-xl rounded-full flex items-center justify-center border-2 border-white/40 text-white shadow-lg md:shadow-xl scale-50 group-hover:scale-100 transition-all duration-500 hover:bg-primary hover:border-primary">
+                                                <span className="material-icons-round text-xl sm:text-2xl md:text-3xl ml-0.5">play_arrow</span>
+                                            </div>
                                         </div>
-                                    </div>
 
 
-                                    {/* Content */}
-                                    <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 md:p-4 z-20 transform group-hover:-translate-y-1 transition-transform duration-500">
-                                        <div className="space-y-1 md:space-y-1.5">
-                                            <h4 className="font-bold text-white text-sm sm:text-base md:text-lg leading-tight line-clamp-2 drop-shadow-lg">
-                                                {item.title}
-                                            </h4>
-                                            <p className="text-slate-300 text-[10px] sm:text-xs font-medium line-clamp-1 drop-shadow">
-                                                {item.subtitle}
-                                            </p>
+                                        {/* Content */}
+                                        <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 md:p-4 z-20 transform group-hover:-translate-y-1 transition-transform duration-500">
+                                            <div className="space-y-1 md:space-y-1.5">
+                                                <h4 className="font-bold text-white text-sm sm:text-base md:text-lg leading-tight line-clamp-2 drop-shadow-lg">
+                                                    {item.title}
+                                                </h4>
+                                                <p className="text-slate-300 text-[10px] sm:text-xs font-medium line-clamp-1 drop-shadow">
+                                                    {item.subtitle}
+                                                </p>
 
-                                            {/* Stats Bar */}
-                                            <div className="hidden sm:flex items-center gap-2 md:gap-3 pt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                                                <div className="flex items-center gap-0.5 md:gap-1 text-white/80">
-                                                    <span className="material-icons-round text-[10px] md:text-xs">trending_up</span>
-                                                    <span className="text-[9px] md:text-[10px] font-bold">Trending</span>
-                                                </div>
-                                                <div className="h-0.5 w-0.5 md:h-1 md:w-1 rounded-full bg-white/40"></div>
-                                                <div className="flex items-center gap-0.5 md:gap-1 text-white/80">
-                                                    <span className="material-icons-round text-[10px] md:text-xs">play_circle</span>
-                                                    <span className="text-[9px] md:text-[10px] font-bold">{item.type || 'Song'}</span>
+                                                {/* Stats Bar */}
+                                                <div className="hidden sm:flex items-center gap-2 md:gap-3 pt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                                                    <div className="flex items-center gap-0.5 md:gap-1 text-white/80">
+                                                        <span className="material-icons-round text-[10px] md:text-xs">trending_up</span>
+                                                        <span className="text-[9px] md:text-[10px] font-bold">Trending</span>
+                                                    </div>
+                                                    <div className="h-0.5 w-0.5 md:h-1 md:w-1 rounded-full bg-white/40"></div>
+                                                    <div className="flex items-center gap-0.5 md:gap-1 text-white/80">
+                                                        <span className="material-icons-round text-[10px] md:text-xs">play_circle</span>
+                                                        <span className="text-[9px] md:text-[10px] font-bold">{item.type || 'Song'}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                </div>
-                            </Link>
-                        ))}
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                 </section>
             );
