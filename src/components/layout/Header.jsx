@@ -279,7 +279,7 @@ export default function Header() {
                                                     return (
                                                         <div
                                                             key={result.id}
-                                                            className="p-2 rounded-xl hover:bg-white/40 dark:hover:bg-white/5 flex items-center gap-3 transition-colors group cursor-pointer relative"
+                                                            className="p-2 rounded-xl hover:bg-white/40 dark:hover:bg-white/5 flex items-center gap-2 transition-colors group cursor-pointer relative"
                                                             onClick={(e) => {
                                                                 if (isSong) {
                                                                     dispatch(setCurrentTrack(result));
@@ -305,7 +305,7 @@ export default function Header() {
                                                                 )}
                                                             </div>
 
-                                                            <div className="flex-1 min-w-0 z-10">
+                                                            <div className="flex-1 min-w-0 z-10 pr-1">
                                                                 <h5 className="text-sm font-semibold text-slate-800 dark:text-gray-100 truncate flex items-center gap-2">
                                                                     {decodeHtmlEntities(result.title)}
                                                                 </h5>
@@ -317,7 +317,7 @@ export default function Header() {
 
                                                             {isSong && (
                                                                 <div
-                                                                    className="z-20 opacity-0 group-hover:opacity-100 transition-opacity scale-90 group-hover:scale-100"
+                                                                    className="z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity md:scale-90 md:group-hover:scale-100 shrink-0"
                                                                     onClick={(e) => e.stopPropagation()}
                                                                 >
                                                                     <TrackMenu song={result} />
